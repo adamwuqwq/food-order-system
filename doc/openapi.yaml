@@ -88,6 +88,8 @@ paths:
           required: true
           name: authorization
           description: /management/login で取得したトークン
+      security:
+        - bearerAuth: []
 
     post:
       tags:
@@ -133,6 +135,8 @@ paths:
           required: true
           name: authorization
           description: /management/login で取得したトークン
+      security:
+        - bearerAuth: []
 
   /management/restaurant/{restaurant_id}:
     get:
@@ -148,6 +152,9 @@ paths:
               schema:
                 type: object
                 properties:
+                  restaurant_id:
+                    type: integer
+                    description: 店舗のID
                   restaurant_name:
                     type: string
                     description: 店舗の名称
@@ -176,6 +183,8 @@ paths:
           required: true
           name: restaurant_id
           description: 情報取得したい店舗のID
+      security:
+        - bearerAuth: []
 
     put:
       tags:
@@ -216,6 +225,8 @@ paths:
           required: true
           name: restaurant_id
           description: 情報編集したい店舗のID
+      security:
+        - bearerAuth: []
 
     delete:
       tags:
@@ -244,6 +255,8 @@ paths:
           required: true
           name: restaurant_id
           description: 削除したい店舗のID
+      security:
+        - bearerAuth: []
 
   /management/account:
     get:
@@ -291,6 +304,8 @@ paths:
           required: true
           name: authorization
           description: /management/login で取得したトークン
+      security:
+        - bearerAuth: []
 
     post:
       tags:
@@ -347,6 +362,8 @@ paths:
           required: true
           name: authorization
           description: /management/login で取得したトークン
+      security:
+        - bearerAuth: []
 
   /management/account/{admin_id}:
     get:
@@ -362,20 +379,28 @@ paths:
               schema:
                 type: object
                 properties:
+                  admin_id:
+                    type: integer
+                    description: 管理者ID
                   name:
                     type: string
+                    description: 管理者名前
                   username:
                     type: string
+                    description: ログイン用ユーザーID
                   restaurants_id:
                     type: array
                     items:
                       type: integer
+                    description: 所属している店舗のID
                   restaurants_name:
                     type: array
                     items:
                       type: string
+                    description: 所属している店舗の名称
                   admin_role:
                     type: string
+                    description: 管理者のロール(system, owner, counter, kitchen)
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -395,6 +420,8 @@ paths:
           required: true
           name: admin_id
           description: 情報取得したい管理者アカウントのID
+      security:
+        - bearerAuth: []
 
     put:
       tags:
@@ -444,6 +471,8 @@ paths:
           required: true
           name: admin_id
           description: 編集したい管理者アカウントのID
+      security:
+        - bearerAuth: []
 
     delete:
       tags:
@@ -472,8 +501,10 @@ paths:
           required: true
           name: admin_id
           description: 削除したい管理者アカウントのID
+      security:
+        - bearerAuth: []
 
-  /management/menu/{restaurant_id}:
+  /management/dish/restaurant/{restaurant_id}:
     get:
       description: 一人のオーナーが複数の店舗を経営している可能性を考慮し、restaurant_idをパラメータとして追加している。
       tags:
@@ -535,6 +566,8 @@ paths:
           required: true
           name: restaurant_id
           description: メニューの一覧を取得したい店舗のID
+      security:
+        - bearerAuth: []
 
     post:
       tags:
@@ -601,8 +634,10 @@ paths:
           required: true
           name: restaurant_id
           description: 料理を追加したい店舗のID
+      security:
+        - bearerAuth: []
 
-  /management/menu/{dish_id}:
+  /management/dish/{dish_id}:
     get:
       tags:
         - management
@@ -616,6 +651,9 @@ paths:
               schema:
                 type: object
                 properties:
+                  dish_id:
+                    type: integer
+                    description: 料理ID
                   dish_name:
                     type: string
                     description: 料理の名称
@@ -650,6 +688,8 @@ paths:
           required: true
           name: dish_id
           description: 情報取得したい料理のID
+      security:
+        - bearerAuth: []
 
     put:
       tags:
@@ -699,6 +739,8 @@ paths:
           required: true
           name: dish_id
           description: 編集したい料理のID
+      security:
+        - bearerAuth: []
 
     delete:
       tags:
@@ -727,8 +769,10 @@ paths:
           required: true
           name: dish_id
           description: 削除したい料理のID
+      security:
+        - bearerAuth: []
 
-  /management/seat/{restaurant_id}:
+  /management/seat/restaurant/{restaurant_id}:
     get:
       tags:
         - management
@@ -781,6 +825,8 @@ paths:
           required: true
           name: restaurant_id
           description: 座席情報を取得したい店舗のID
+      security:
+        - bearerAuth: []
 
     post:
       tags:
@@ -831,6 +877,8 @@ paths:
           required: true
           name: restaurant_id
           description: 座席を追加したい店舗のID
+      security:
+        - bearerAuth: []
 
   /management/seat/{seat_id}:
     get:
@@ -880,6 +928,8 @@ paths:
           required: true
           name: seat_id
           description: 座席情報を取得したい座席のID
+      security:
+        - bearerAuth: []
 
     put:
       tags:
@@ -929,6 +979,8 @@ paths:
           required: true
           name: seat_id
           description: 編集したい座席のID
+      security:
+        - bearerAuth: []
 
     delete:
       tags:
@@ -957,6 +1009,8 @@ paths:
           required: true
           name: seat_id
           description: 削除したい座席のID
+      security:
+        - bearerAuth: []
 
   /management/seat/{seat_id}/refresh:
     put:
@@ -994,8 +1048,10 @@ paths:
           required: true
           name: seat_id
           description: QRコードトークンを再発行したい座席のID
+      security:
+        - bearerAuth: []
 
-  /management/order/{restaurant_id}:
+  /management/order/restaurant/{restaurant_id}:
     get:
       tags:
         - management
@@ -1057,8 +1113,10 @@ paths:
           required: true
           name: restaurant_id
           description: 注文一覧を取得したい店舗のID
+      security:
+        - bearerAuth: []
 
-  /management/order/{restaurant_id}/unserved:
+  /management/order/restaurant/{restaurant_id}/unserved:
     get:
       tags:
         - management
@@ -1077,6 +1135,9 @@ paths:
                     items:
                       type: object
                       properties:
+                        order_id:
+                          type: integer
+                          description: 注文ID
                         ordered_dish_id:
                           type: integer
                           description: 注文した料理のID
@@ -1104,6 +1165,8 @@ paths:
           description: Unauthorized (トークンが無効)
         "403":
           description: Permission Denied (owner, counter, kitchenは自分の店舗のみ取得可能)
+      security:
+        - bearerAuth: []
 
   /management/order/{order_id}:
     get:
@@ -1119,7 +1182,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
+                  order_id:
                     type: integer
                     description: 注文ID
                   ordered_date:
@@ -1185,6 +1248,8 @@ paths:
           required: true
           name: order_id
           description: 注文詳細を取得したい注文のID
+      security:
+        - bearerAuth: []
 
   /management/order/{order_id}/checkout:
     put:
@@ -1215,8 +1280,10 @@ paths:
           required: true
           name: order_id
           description: 注文のID
+      security:
+        - bearerAuth: []
 
-  /management/order/dish/{ordered_dish_id}/cancel:
+  /management/order/ordered_dish/{ordered_dish_id}/cancel:
     put:
       tags:
         - management
@@ -1244,8 +1311,10 @@ paths:
           required: true
           name: ordered_dish_id
           description: キャンセルしたい料理の注文ID
+      security:
+        - bearerAuth: []
 
-  /management/order/dish/{ordered_dish_id}/deliver:
+  /management/order/ordered_dish/{ordered_dish_id}/deliver:
     put:
       tags:
         - management
@@ -1273,6 +1342,8 @@ paths:
           required: true
           name: ordered_dish_id
           description: 注文した料理の注文ID
+      security:
+        - bearerAuth: []
 
   /customer/menu:
     get:
@@ -1322,7 +1393,8 @@ paths:
           required: true
           name: authorization
           description: 座席のQRコードに含まれているトークン
-
+      security:
+        - bearerAuth: []
 
   /customer/menu/{dish_id}:
     get:
@@ -1370,7 +1442,8 @@ paths:
           required: true
           name: dish_id
           description: 料理のID
-
+      security:
+        - bearerAuth: []
 
   /customer/order:
     get:
@@ -1429,6 +1502,8 @@ paths:
           required: true
           name: authorization
           description: 座席のQRコードに含まれているトークン
+      security:
+        - bearerAuth: []
 
     post:
       tags:
@@ -1489,7 +1564,8 @@ paths:
           required: true
           name: authorization
           description: 座席のQRコードに含まれているトークン
-
+      security:
+        - bearerAuth: []
 
   /customer/order/finish:
     post:
@@ -1512,3 +1588,12 @@ paths:
           required: true
           name: authorization
           description: 座席のQRコードに含まれているトークン
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

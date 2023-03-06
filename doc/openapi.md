@@ -2,7 +2,11 @@
 
 <h1 id="-">飲食店向け簡易オーダーシステム v1.0</h1>
 
+> Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
+Base URLs:
+
+* <a href="http://localhost:3000">http://localhost:3000</a>
 
 <h1 id="--management">management</h1>
 
@@ -59,7 +63,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» request_token|string|false|none|JWTトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## restaurantList
 
@@ -112,7 +118,9 @@ Status Code **200**
 |»» owner_admin_id|integer|false|none|none|
 |»» owner_name|string|false|none|none|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## restaurantSignUp
 
@@ -167,7 +175,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» restaurant_id|integer|false|none|店舗のID|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## restaurantGet
 
@@ -215,7 +225,9 @@ Status Code **200**
 |» owner_admin_id|integer|false|none|オーナーの管理者ID|
 |» owner_name|string|false|none|オーナーの名前|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## restaurantModify
 
@@ -253,7 +265,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (ownerは自分の店舗のみ編集可。counter, kitchenはアクセス権がない)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## restaurantDelete
 
@@ -279,7 +293,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (system管理者のみアクセス可)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## adminList
 
@@ -340,7 +356,9 @@ Status Code **200**
 |»» restaurants_name|[string]|false|none|none|
 |»» admin_role|string|false|none|none|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## adminSignUp
 
@@ -401,7 +419,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» admin_id|integer|false|none|管理者ID|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## adminGet
 
@@ -457,7 +477,9 @@ Status Code **200**
 |» restaurants_name|[string]|false|none|none|
 |» admin_role|string|false|none|none|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## adminModify
 
@@ -501,7 +523,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenは自分以外のアカウント情報を編集できない。ownerは自分の店舗のアカウントのみ編集可能)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## adminDelete
 
@@ -527,7 +551,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗に所属しているアカウントのみ削除可能)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## menuList
 
@@ -593,7 +619,9 @@ Status Code **200**
 |»»» price|integer|false|none|料理の価格|
 |»»» available_num|integer|false|none|料理の在庫数|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## menuCreate
 
@@ -660,7 +688,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» dish_id|integer|false|none|追加された料理のID|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## dishGet
 
@@ -712,7 +742,9 @@ Status Code **200**
 |» available_num|integer|false|none|料理の在庫数|
 |» image_url|string|false|none|料理の画像|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## dishModify
 
@@ -756,7 +788,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenは自分の店舗の料理の在庫数のみ変更可。ownerは自分の店舗の料理のみ編集可能)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## dishDelete
 
@@ -782,7 +816,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗の料理のみ削除可能)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatList
 
@@ -839,7 +875,9 @@ Status Code **200**
 |»» order_id|integer|false|none|座席の注文ID|
 |»» qr_code_token|string|false|none|座席のQRコードのトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatAdd
 
@@ -895,7 +933,9 @@ Status Code **200**
 |» seat_id|integer|false|none|追加された座席のID|
 |» qr_code_token|string|false|none|追加された座席のQRコードのトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatInfo
 
@@ -947,7 +987,9 @@ Status Code **200**
 |» order_id|integer|false|none|座席の注文ID|
 |» qr_code_token|string|false|none|座席のQRコードのトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatEdit
 
@@ -1005,7 +1047,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» qr_code_token|string|false|none|編集された座席のQRコードのトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatDelete
 
@@ -1031,7 +1075,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を削除可能)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## seatRefresh
 
@@ -1075,7 +1121,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» qr_code_token|string|false|none|再発行された座席のQRコードのトークン|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## orderList
 
@@ -1138,7 +1186,9 @@ Status Code **200**
 |»» is_order_finished|boolean|false|none|注文が完了しているかどうか|
 |»» is_paid|boolean|false|none|支払いが完了しているかどうか|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## unservedDishList
 
@@ -1192,7 +1242,9 @@ Status Code **200**
 |»» seat_name|string|false|none|座席名|
 |»» ordered_date|string|false|none|注文日時|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## orderGet
 
@@ -1220,7 +1272,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counterは自分の店舗のみアクセス可能、kitchenはアクセス不可)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## orderedDishCancel
 
@@ -1246,7 +1300,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counterは自分の店舗の注文のみキャンセル可能、kitchenはアクセス不可)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## orderedDishDelivery
 
@@ -1272,7 +1328,9 @@ Status Code **200**
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counter, kitchenは自分の店舗のみアクセス可)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 <h1 id="--customer">customer</h1>
 
@@ -1334,7 +1392,9 @@ Status Code **200**
 |»» price|integer|false|none|料理の価格|
 |»» available_num|integer|false|none|料理の在庫数|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## customerMenuDishGet
 
@@ -1385,7 +1445,9 @@ Status Code **200**
 |» price|integer|false|none|料理の価格|
 |» available_num|integer|false|none|料理の在庫数|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## customerOrderGet
 
@@ -1449,7 +1511,9 @@ Status Code **200**
 |» is_paid|boolean|false|none|会計済みかどうか|
 |» created_at|string|false|none|注文日時|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## customerOrderPost
 
@@ -1517,7 +1581,9 @@ Status Code **200**
 |»» ordered_dish_id|integer|false|none|注文した料理の注文ID|
 |»» ordered_dish_name|string|false|none|注文した料理の名称|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
 ## customerOrderFinish
 
@@ -1543,5 +1609,7 @@ Status Code **200**
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request (注文が既に締め切られている、もしくは未注文)|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 
-
+<aside class="success">
+This operation does not require authentication
+</aside>
 
