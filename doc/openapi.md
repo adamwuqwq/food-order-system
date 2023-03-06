@@ -8,6 +8,10 @@ Base URLs:
 
 * <a href="http://localhost:3000">http://localhost:3000</a>
 
+# Authentication
+
+- HTTP Authentication, scheme: bearer 
+
 <h1 id="--management">management</h1>
 
 管理者（システム提供、オーナー、レジ、厨房）側
@@ -118,8 +122,9 @@ Status Code **200**
 |»» owner_admin_id|integer|false|none|none|
 |»» owner_name|string|false|none|none|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## restaurantSignUp
@@ -175,8 +180,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» restaurant_id|integer|false|none|店舗のID|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## restaurantGet
@@ -200,6 +206,7 @@ This operation does not require authentication
 
 ```json
 {
+  "restaurant_id": 0,
   "restaurant_name": "string",
   "owner_admin_id": 0,
   "owner_name": "string"
@@ -221,12 +228,14 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
+|» restaurant_id|integer|false|none|店舗のID|
 |» restaurant_name|string|false|none|店舗の名称|
 |» owner_admin_id|integer|false|none|オーナーの管理者ID|
 |» owner_name|string|false|none|オーナーの名前|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## restaurantModify
@@ -265,8 +274,9 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (ownerは自分の店舗のみ編集可。counter, kitchenはアクセス権がない)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## restaurantDelete
@@ -293,8 +303,9 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (system管理者のみアクセス可)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## adminList
@@ -356,8 +367,9 @@ Status Code **200**
 |»» restaurants_name|[string]|false|none|none|
 |»» admin_role|string|false|none|none|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## adminSignUp
@@ -419,8 +431,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» admin_id|integer|false|none|管理者ID|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## adminGet
@@ -444,6 +457,7 @@ This operation does not require authentication
 
 ```json
 {
+  "admin_id": 0,
   "name": "string",
   "username": "string",
   "restaurants_id": [
@@ -471,14 +485,16 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» name|string|false|none|none|
-|» username|string|false|none|none|
-|» restaurants_id|[integer]|false|none|none|
-|» restaurants_name|[string]|false|none|none|
-|» admin_role|string|false|none|none|
+|» admin_id|integer|false|none|管理者ID|
+|» name|string|false|none|管理者名前|
+|» username|string|false|none|ログイン用ユーザーID|
+|» restaurants_id|[integer]|false|none|所属している店舗のID|
+|» restaurants_name|[string]|false|none|所属している店舗の名称|
+|» admin_role|string|false|none|管理者のロール(system, owner, counter, kitchen)|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## adminModify
@@ -523,8 +539,9 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenは自分以外のアカウント情報を編集できない。ownerは自分の店舗のアカウントのみ編集可能)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## adminDelete
@@ -551,15 +568,16 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗に所属しているアカウントのみ削除可能)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## menuList
 
 <a id="opIdmenuList"></a>
 
-`GET /management/menu/{restaurant_id}`
+`GET /management/dish/restaurant/{restaurant_id}`
 
 *料理メニューの一覧取得*
 
@@ -619,15 +637,16 @@ Status Code **200**
 |»»» price|integer|false|none|料理の価格|
 |»»» available_num|integer|false|none|料理の在庫数|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## menuCreate
 
 <a id="opIdmenuCreate"></a>
 
-`POST /management/menu/{restaurant_id}`
+`POST /management/dish/restaurant/{restaurant_id}`
 
 *メニューに料理を追加(新規作成)*
 
@@ -688,15 +707,16 @@ Status Code **200**
 |---|---|---|---|---|
 |» dish_id|integer|false|none|追加された料理のID|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## dishGet
 
 <a id="opIddishGet"></a>
 
-`GET /management/menu/{dish_id}`
+`GET /management/dish/{dish_id}`
 
 *指定した料理情報取得*
 
@@ -713,6 +733,7 @@ This operation does not require authentication
 
 ```json
 {
+  "dish_id": 0,
   "dish_name": "string",
   "dish_category": "string",
   "price": 0,
@@ -736,21 +757,23 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
+|» dish_id|integer|false|none|料理ID|
 |» dish_name|string|false|none|料理の名称|
 |» dish_category|string|false|none|料理の種類|
 |» price|integer|false|none|料理の値段|
 |» available_num|integer|false|none|料理の在庫数|
 |» image_url|string|false|none|料理の画像|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## dishModify
 
 <a id="opIddishModify"></a>
 
-`PUT /management/menu/{dish_id}`
+`PUT /management/dish/{dish_id}`
 
 *料理情報編集*
 
@@ -788,15 +811,16 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenは自分の店舗の料理の在庫数のみ変更可。ownerは自分の店舗の料理のみ編集可能)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## dishDelete
 
 <a id="opIddishDelete"></a>
 
-`DELETE /management/menu/{dish_id}`
+`DELETE /management/dish/{dish_id}`
 
 *料理の削除*
 
@@ -816,15 +840,16 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗の料理のみ削除可能)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatList
 
 <a id="opIdseatList"></a>
 
-`GET /management/seat/{restaurant_id}`
+`GET /management/seat/restaurant/{restaurant_id}`
 
 *指定した店舗の座席情報一覧を取得*
 
@@ -875,15 +900,16 @@ Status Code **200**
 |»» order_id|integer|false|none|座席の注文ID|
 |»» qr_code_token|string|false|none|座席のQRコードのトークン|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatAdd
 
 <a id="opIdseatAdd"></a>
 
-`POST /management/seat/{restaurant_id}`
+`POST /management/seat/restaurant/{restaurant_id}`
 
 *座席の追加*
 
@@ -933,8 +959,9 @@ Status Code **200**
 |» seat_id|integer|false|none|追加された座席のID|
 |» qr_code_token|string|false|none|追加された座席のQRコードのトークン|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatInfo
@@ -987,8 +1014,9 @@ Status Code **200**
 |» order_id|integer|false|none|座席の注文ID|
 |» qr_code_token|string|false|none|座席のQRコードのトークン|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatEdit
@@ -1047,8 +1075,9 @@ Status Code **200**
 |---|---|---|---|---|
 |» qr_code_token|string|false|none|編集された座席のQRコードのトークン|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatDelete
@@ -1075,8 +1104,9 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を削除可能)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## seatRefresh
@@ -1121,15 +1151,16 @@ Status Code **200**
 |---|---|---|---|---|
 |» qr_code_token|string|false|none|再発行された座席のQRコードのトークン|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## orderList
 
 <a id="opIdorderList"></a>
 
-`GET /management/order/{restaurant_id}`
+`GET /management/order/restaurant/{restaurant_id}`
 
 *指定した店舗の注文一覧の取得*
 
@@ -1186,15 +1217,16 @@ Status Code **200**
 |»» is_order_finished|boolean|false|none|注文が完了しているかどうか|
 |»» is_paid|boolean|false|none|支払いが完了しているかどうか|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## unservedDishList
 
 <a id="opIdunservedDishList"></a>
 
-`GET /management/order/{restaurant_id}/unserved`
+`GET /management/order/restaurant/{restaurant_id}/unserved`
 
 *指定した店舗の未提供料理一覧を取得 (注文時間順)*
 
@@ -1206,6 +1238,7 @@ This operation does not require authentication
 {
   "unserved_dishes": [
     {
+      "order_id": 0,
       "ordered_dish_id": 0,
       "dish_id": 0,
       "dish_name": "string",
@@ -1234,6 +1267,7 @@ Status Code **200**
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |» unserved_dishes|[object]|false|none|none|
+|»» order_id|integer|false|none|注文ID|
 |»» ordered_dish_id|integer|false|none|注文した料理のID|
 |»» dish_id|integer|false|none|注文した料理の料理ID|
 |»» dish_name|string|false|none|注文した料理の名前|
@@ -1242,8 +1276,9 @@ Status Code **200**
 |»» seat_name|string|false|none|座席名|
 |»» ordered_date|string|false|none|注文日時|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## orderGet
@@ -1272,15 +1307,16 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counterは自分の店舗のみアクセス可能、kitchenはアクセス不可)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## orderedDishCancel
 
 <a id="opIdorderedDishCancel"></a>
 
-`PUT /management/order/dish/{ordered_dish_id}/cancel`
+`PUT /management/order/ordered_dish/{ordered_dish_id}/cancel`
 
 *注文した(+未提供)料理のキャンセル*
 
@@ -1300,15 +1336,16 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counterは自分の店舗の注文のみキャンセル可能、kitchenはアクセス不可)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## orderedDishDelivery
 
 <a id="opIdorderedDishDelivery"></a>
 
-`PUT /management/order/dish/{ordered_dish_id}/deliver`
+`PUT /management/order/ordered_dish/{ordered_dish_id}/deliver`
 
 *注文ステータスを提供済みにする*
 
@@ -1328,8 +1365,9 @@ This operation does not require authentication
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (owner, counter, kitchenは自分の店舗のみアクセス可)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 <h1 id="--customer">customer</h1>
@@ -1392,8 +1430,9 @@ Status Code **200**
 |»» price|integer|false|none|料理の価格|
 |»» available_num|integer|false|none|料理の在庫数|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## customerMenuDishGet
@@ -1445,8 +1484,9 @@ Status Code **200**
 |» price|integer|false|none|料理の価格|
 |» available_num|integer|false|none|料理の在庫数|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## customerOrderGet
@@ -1511,8 +1551,9 @@ Status Code **200**
 |» is_paid|boolean|false|none|会計済みかどうか|
 |» created_at|string|false|none|注文日時|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## customerOrderPost
@@ -1581,8 +1622,9 @@ Status Code **200**
 |»» ordered_dish_id|integer|false|none|注文した料理の注文ID|
 |»» ordered_dish_name|string|false|none|注文した料理の名称|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
 ## customerOrderFinish
@@ -1609,7 +1651,8 @@ This operation does not require authentication
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request (注文が既に締め切られている、もしくは未注文)|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
 </aside>
 
