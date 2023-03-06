@@ -1,0 +1,1514 @@
+openapi: 3.0.0
+info:
+  title: 飲食店向け簡易オーダーシステム
+  version: "1.0"
+servers:
+  - url: "http://localhost:3000"
+tags:
+  - name: management
+    description: 管理者（システム提供、オーナー、レジ、厨房）側
+  - name: customer
+    description: 来客側
+paths:
+  /management/login:
+    post:
+      tags:
+        - management
+      summary: 管理者(system, owner, counter, kitchen)ログイン
+      operationId: adminLogin
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_token:
+                    type: string
+                    description: JWTトークン
+                required:
+                  - requestToken
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (ユーザーネームまたはパスワードが無効)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: ログイン用ユーザーID
+                password:
+                  type: string
+                  description: ログイン用パスワード
+              required:
+                - username
+                - password
+      parameters: []
+
+  /management/restaurant:
+    get:
+      tags:
+        - management
+      summary: 店舗の一覧取得 (ownerは自分の店舗のみ取得可能)
+      operationId: restaurantList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        restaurant_id:
+                          type: integer
+                        restaurant_name:
+                          type: string
+                        owner_admin_id:
+                          type: integer
+                        owner_name:
+                          type: string
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+
+    post:
+      tags:
+        - management
+      summary: 新規店舗登録
+      operationId: restaurantSignUp
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurant_id:
+                    type: integer
+                    description: 店舗のID
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, counter, kitchenはアクセス権がない)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin_owner_id:
+                  type: integer
+                  description: オーナーの管理者ID
+                restaurant_name:
+                  type: string
+                  description: 店舗の名称
+              required:
+                - admin_owner_id
+                - restaurant_name
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+
+  /management/restaurant/{restaurant_id}:
+    get:
+      tags:
+        - management
+      summary: 指定した店舗情報取得
+      operationId: restaurantGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurant_name:
+                    type: string
+                    description: 店舗の名称
+                  owner_admin_id:
+                    type: integer
+                    description: オーナーの管理者ID
+                  owner_name:
+                    type: string
+                    description: オーナーの名前
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 情報取得したい店舗のID
+
+    put:
+      tags:
+        - management
+      summary: 店舗情報編集
+      operationId: restaurantModify
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (ownerは自分の店舗のみ編集可。counter, kitchenはアクセス権がない)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                restaurant_name:
+                  type: string
+                  description: 店舗の名称
+                owner_admin_id:
+                  type: integer
+                  description: オーナーの管理者ID
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 情報編集したい店舗のID
+
+    delete:
+      tags:
+        - management
+      summary: 店舗の削除
+      operationId: restaurantDelete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (restaurant_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (system管理者のみアクセス可)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 削除したい店舗のID
+
+  /management/account:
+    get:
+      tags:
+        - management
+      summary: 管理者アカウントの一覧取得 (ownerは自分の店舗に所属しているアカウントのみ取得可能)
+      operationId: adminList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admins:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        admin_id:
+                          type: integer
+                        name:
+                          type: string
+                        username:
+                          type: string
+                        restaurants_id:
+                          type: array
+                          items:
+                            type: integer
+                        restaurants_name:
+                          type: array
+                          items:
+                            type: string
+                        admin_role:
+                          type: string
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+
+    post:
+      tags:
+        - management
+      summary: 新規管理者アカウント(owner, counter, kitchen)発行
+      operationId: adminSignUp
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admin_id:
+                    type: integer
+                    description: 管理者ID
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerはownerアカウントを発行できない)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin_name:
+                  type: string
+                  description: 管理者名前
+                username:
+                  type: string
+                  description: ログイン用ユーザーID
+                password:
+                  type: string
+                  description: ログイン用パスワード
+                restaurant_id:
+                  type: integer
+                  description: 所属している店舗のID
+                admin_role:
+                  type: string
+                  description: 管理者のロール(owner, counter, kitchen)
+              required:
+                - admin_name
+                - username
+                - password
+                - admin_role
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+
+  /management/account/{admin_id}:
+    get:
+      tags:
+        - management
+      summary: 管理者アカウント情報取得
+      operationId: adminGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  username:
+                    type: string
+                  restaurants_id:
+                    type: array
+                    items:
+                      type: integer
+                  restaurants_name:
+                    type: array
+                    items:
+                      type: string
+                  admin_role:
+                    type: string
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のアカウントのみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: admin_id
+          description: 情報取得したい管理者アカウントのID
+
+    put:
+      tags:
+        - management
+      summary: 管理者アカウント(owner, counter, kitchen)情報編集
+      operationId: adminModify
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenは自分以外のアカウント情報を編集できない。ownerは自分の店舗のアカウントのみ編集可能)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                admin_name:
+                  type: string
+                  description: 管理者名前
+                login_id:
+                  type: string
+                  description: ログイン用ユーザーID
+                password:
+                  type: string
+                  description: ログイン用パスワード
+                restaurant_id:
+                  type: integer
+                  description: 所属している店舗のID
+                admin_role:
+                  type: string
+                  description: 管理者のロール(owner, counter, kitchen)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: admin_id
+          description: 編集したい管理者アカウントのID
+
+    delete:
+      tags:
+        - management
+      summary: 管理者アカウント(owner, counter, kitchen)削除
+      operationId: adminDelete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (admin_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗に所属しているアカウントのみ削除可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: admin_id
+          description: 削除したい管理者アカウントのID
+
+  /management/menu/{restaurant_id}:
+    get:
+      description: 一人のオーナーが複数の店舗を経営している可能性を考慮し、restaurant_idをパラメータとして追加している。
+      tags:
+        - management
+      summary: 料理メニューの一覧取得
+      operationId: menuList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category_name:
+                          type: string
+                          description: カテゴリ名
+                        dishes:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              dish_id:
+                                type: integer
+                                description: 料理ID
+                              dish_name:
+                                type: string
+                                description: 料理名
+                              image_url:
+                                type: string
+                                description: 料理画像のURL
+                              price:
+                                type: integer
+                                description: 料理の価格
+                              available_num:
+                                type: integer
+                                description: 料理の在庫数
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: string
+          in: path
+          required: true
+          name: restaurant_id
+          description: メニューの一覧を取得したい店舗のID
+
+    post:
+      tags:
+        - management
+      summary: メニューに料理を追加(新規作成)
+      operationId: menuCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dish_id:
+                    type: integer
+                    description: 追加された料理のID
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分以外の店舗のメニューにアクセスできない)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dishes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dish_name:
+                        type: string
+                        description: 料理の名称
+                      dish_category:
+                        type: string
+                        description: 料理の種類
+                      price:
+                        type: integer
+                        description: 料理の値段
+                      available_num:
+                        type: integer
+                        description: 料理の在庫数
+                      image_url:
+                        type: string
+                        description: 料理の画像
+                    required:
+                      - dish_name
+                      - price
+                      - available_num
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: string
+          in: path
+          required: true
+          name: restaurant_id
+          description: 料理を追加したい店舗のID
+
+  /management/menu/{dish_id}:
+    get:
+      tags:
+        - management
+      summary: 指定した料理情報取得
+      operationId: dishGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dish_name:
+                    type: string
+                    description: 料理の名称
+                  dish_category:
+                    type: string
+                    description: 料理の種類
+                  price:
+                    type: integer
+                    description: 料理の値段
+                  available_num:
+                    type: integer
+                    description: 料理の在庫数
+                  image_url:
+                    type: string
+                    description: 料理の画像
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: dish_id
+          description: 情報取得したい料理のID
+
+    put:
+      tags:
+        - management
+      summary: 料理情報編集
+      operationId: dishModify
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenは自分の店舗の料理の在庫数のみ変更可。ownerは自分の店舗の料理のみ編集可能)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dish_name:
+                  type: string
+                  description: 料理の名称
+                dish_category:
+                  type: string
+                  description: 料理の種類
+                price:
+                  type: integer
+                  description: 料理の値段
+                available_num:
+                  type: integer
+                  description: 料理の在庫数
+                image_url:
+                  type: string
+                  description: 料理の画像
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: dish_id
+          description: 編集したい料理のID
+
+    delete:
+      tags:
+        - management
+      summary: 料理の削除
+      operationId: dishDelete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (dish_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗の料理のみ削除可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: dish_id
+          description: 削除したい料理のID
+
+  /management/seat/{restaurant_id}:
+    get:
+      tags:
+        - management
+      summary: 指定した店舗の座席情報一覧を取得
+      operationId: seatList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        seat_id:
+                          type: integer
+                          description: 座席のID
+                        seat_name:
+                          type: string
+                          description: 座席の名称
+                        is_available:
+                          type: boolean
+                          description: 座席の空席状況 (空席true, 満席false)
+                        order_id:
+                          type: integer
+                          description: 座席の注文ID
+                        qr_code_token:
+                          type: string
+                          description: 座席のQRコードのトークン
+        "400":
+          description: Bad Request (restaurant_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 座席情報を取得したい店舗のID
+
+    post:
+      tags:
+        - management
+      summary: 座席の追加
+      operationId: seatAdd
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seat_id:
+                    type: integer
+                    description: 追加された座席のID
+                  qr_code_token:
+                    type: string
+                    description: 追加された座席のQRコードのトークン
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を追加可能)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seat_name:
+                  type: string
+                  description: 座席の名称
+              required:
+                - seat_name
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 座席を追加したい店舗のID
+
+  /management/seat/{seat_id}:
+    get:
+      tags:
+        - management
+      summary: 指定した座席の情報を取得
+      operationId: seatInfo
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seat_id:
+                    type: integer
+                    description: 座席のID
+                  seat_name:
+                    type: string
+                    description: 座席の名称
+                  is_available:
+                    type: boolean
+                    description: 座席の空席状況 (空席true, 満席false)
+                  order_id:
+                    type: integer
+                    description: 座席の注文ID
+                  qr_code_token:
+                    type: string
+                    description: 座席のQRコードのトークン
+        "400":
+          description: Bad Request (seat_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_id
+          description: 座席情報を取得したい座席のID
+
+    put:
+      tags:
+        - management
+      summary: 座席の編集 (編集後、自動QRコードトークン再発行)
+      description: 空席 -> 使用不可に変更したい場合にも使える
+      operationId: seatEdit
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qr_code_token:
+                    type: string
+                    description: 編集された座席のQRコードのトークン
+        "400":
+          description: Bad Request (リクエストに不備がある、もしくは座席が利用中で編集禁止)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を編集可能)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seat_name:
+                  type: string
+                  description: 座席の名称
+                is_available:
+                  type: boolean
+                  description: 座席の空席状況 (空席true, 満席、利用不可false)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_id
+          description: 編集したい座席のID
+
+    delete:
+      tags:
+        - management
+      summary: 座席の削除
+      operationId: seatDelete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (seat_idに不備がある、もしくは座席が利用中で削除禁止)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を削除可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_id
+          description: 削除したい座席のID
+
+  /management/seat/{seat_id}/refresh:
+    put:
+      tags:
+        - management
+      summary: 座席のQRコードトークンを再発行
+      operationId: seatRefresh
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qr_code_token:
+                    type: string
+                    description: 再発行された座席のQRコードのトークン
+        "400":
+          description: Bad Request (seat_idに不備がある, もしくは座席が利用中で再発行禁止)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, ownerは自分の店舗の座席のQRコードトークンを再発行可能。kitchenはアクセス不可)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_id
+          description: QRコードトークンを再発行したい座席のID
+
+  /management/order/{restaurant_id}:
+    get:
+      tags:
+        - management
+      summary: 指定した店舗の注文一覧の取得
+      operationId: orderList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: 注文ID
+                        ordered_date:
+                          type: string
+                          description: 注文日時
+                        seat_id:
+                          type: integer
+                          description: 座席ID
+                        seat_name:
+                          type: string
+                          description: 座席名
+                        total_price:
+                          type: integer
+                          description: 合計金額
+                        is_all_delivered:
+                          type: boolean
+                          description: 全ての料理が配達済みかどうか
+                        is_order_finished:
+                          type: boolean
+                          description: 注文が完了しているかどうか
+                        is_paid:
+                          type: boolean
+                          description: 支払いが完了しているかどうか
+        "400":
+          description: Bad Request (restaurant_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 注文一覧を取得したい店舗のID
+
+  /management/order/{restaurant_id}/unserved:
+    get:
+      tags:
+        - management
+      summary: 指定した店舗の未提供料理一覧を取得 (注文時間順)
+      operationId: unservedDishList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  unserved_dishes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ordered_dish_id:
+                          type: integer
+                          description: 注文した料理のID
+                        dish_id:
+                          type: integer
+                          description: 注文した料理の料理ID
+                        dish_name:
+                          type: string
+                          description: 注文した料理の名前
+                        quantity:
+                          type: integer
+                          description: 注文した料理の数量
+                        seat_id:
+                          type: integer
+                          description: 座席ID
+                        seat_name:
+                          type: string
+                          description: 座席名
+                        ordered_date:
+                          type: string
+                          description: 注文日時
+        "400":
+          description: Bad Request (restaurant_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, counter, kitchenは自分の店舗のみ取得可能)
+
+  /management/order/{order_id}:
+    get:
+      tags:
+        - management
+      summary: 注文詳細の取得
+      operationId: orderGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 注文ID
+                  ordered_date:
+                    type: string
+                    description: 注文日時
+                  seat_id:
+                    type: integer
+                    description: 座席ID
+                  seat_name:
+                    type: string
+                    description: 座席名
+                  is_all_delivered:
+                    type: boolean
+                    description: 全ての料理が配達済みかどうか
+                  is_order_finished:
+                    type: boolean
+                    description: 注文が完了しているかどうか
+                  is_paid:
+                    type: boolean
+                    description: 支払いが完了しているかどうか
+                  ordered_items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ordered_dish_id:
+                          type: integer
+                          description: 注文した料理のID
+                        dish_id:
+                          type: integer
+                          description: 注文した料理の料理ID
+                        dish_name:
+                          type: string
+                          description: 注文した料理の名前
+                        dish_price:
+                          type: integer
+                          description: 注文した料理の単価
+                        dish_quantity:
+                          type: integer
+                          description: 注文した料理の数量
+                        is_delivered:
+                          type: boolean
+                          description: その料理が配達済みかどうか
+                  total_price:
+                    type: integer
+                    description: 合計金額
+        "400":
+          description: Bad Request (order_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, kitchen, counterは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: order_id
+          description: 注文詳細を取得したい注文のID
+
+  /management/order/{order_id}/checkout:
+    put:
+      tags:
+        - management
+      description: 注文状態(is_paid)、座席のQRコードトークンを更新する。
+      summary: (会計済みボタン) 注文を完了する
+      operationId: orderGet
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (order_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, counterは自分の店舗のみアクセス可能、kitchenはアクセス不可)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: order_id
+          description: 注文のID
+
+  /management/order/dish/{ordered_dish_id}/cancel:
+    put:
+      tags:
+        - management
+      summary: 注文した(+未提供)料理のキャンセル
+      operationId: orderedDishCancel
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (ordered_dish_idに不備がある、もしくは提供済みでキャンセルできない)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, counterは自分の店舗の注文のみキャンセル可能、kitchenはアクセス不可)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: ordered_dish_id
+          description: キャンセルしたい料理の注文ID
+
+  /management/order/dish/{ordered_dish_id}/deliver:
+    put:
+      tags:
+        - management
+      summary: 注文ステータスを提供済みにする
+      operationId: orderedDishDelivery
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (ordered_dish_idに不備がある、もしくは既に提供済み)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (owner, counter, kitchenは自分の店舗のみアクセス可)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: ordered_dish_id
+          description: 注文した料理の注文ID
+
+  /customer/menu:
+    get:
+      tags:
+        - customer
+      summary: メニューの取得
+      operationId: customerMenuGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category_name:
+                      type: string
+                      description: カテゴリ名
+                    dishes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          dish_id:
+                            type: integer
+                            description: 料理ID
+                          dish_name:
+                            type: string
+                            description: 料理名
+                          image_url:
+                            type: string
+                            description: 料理画像のURL
+                          price:
+                            type: integer
+                            description: 料理の価格
+                          available_num:
+                            type: integer
+                            description: 料理の在庫数
+        "401":
+          description: Unauthorized (トークンが無効)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: 座席のQRコードに含まれているトークン
+
+
+  /customer/menu/{dish_id}:
+    get:
+      tags:
+        - customer
+      summary: 料理の詳細を取得
+      operationId: customerMenuDishGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dish_id:
+                    type: integer
+                    description: 料理ID
+                  dish_name:
+                    type: string
+                    description: 料理名
+                  image_url:
+                    type: string
+                    description: 料理画像のURL
+                  price:
+                    type: integer
+                    description: 料理の価格
+                  available_num:
+                    type: integer
+                    description: 料理の在庫数
+        "400":
+          description: Bad Request (dish_idに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: 座席のQRコードに含まれているトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: dish_id
+          description: 料理のID
+
+
+  /customer/order:
+    get:
+      tags:
+        - customer
+      summary: 注文履歴、合計金額の取得
+      operationId: customerOrderGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order_id:
+                      type: integer
+                      description: 注文ID
+                    ordered_dishes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          ordered_dish_id:
+                            type: integer
+                            description: 注文した料理の注文ID
+                          ordered_dish_name:
+                            type: string
+                            description: 注文した料理の名称
+                          ordered_dish_price:
+                            type: integer
+                            description: 注文した料理の価格
+                          ordered_dish_num:
+                            type: integer
+                            description: 注文した料理の個数
+                          ordered_dish_status:
+                            type: string
+                            description: 注文した料理のステータス
+                    total_price:
+                      type: integer
+                      description: 合計金額
+                    is_paid:
+                      type: boolean
+                      description: 会計済みかどうか
+                    created_at:
+                      type: string
+                      description: 注文日時
+        "401":
+          description: Unauthorized (トークンが無効)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: 座席のQRコードに含まれているトークン
+
+    post:
+      tags:
+        - customer
+      summary: 注文・追加注文送信
+      operationId: customerOrderPost
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: integer
+                    description: 注文ID
+                  ordered_dishes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ordered_dish_id:
+                          type: integer
+                          description: 注文した料理の注文ID
+                        ordered_dish_name:
+                          type: string
+                          description: 注文した料理の名称
+        "400":
+          description: Bad Request (注文リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ordered_dishes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      dish_id:
+                        type: integer
+                        description: 注文した料理のID
+                      quantity:
+                        type: integer
+                        description: 注文した料理の数量
+                    required:
+                      - dish_id
+                      - quantity
+        required: true
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: 座席のQRコードに含まれているトークン
+
+
+  /customer/order/finish:
+    post:
+      tags:
+        - customer
+      summary: 注文確定・会計依頼
+      description: お会計ボタンを押すとそこで注文が締め切られる。is_order_finishedの状態を変更する(false → true)。
+      operationId: customerOrderFinish
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request (注文が既に締め切られている、もしくは未注文)
+        "401":
+          description: Unauthorized (トークンが無効)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: 座席のQRコードに含まれているトークン
