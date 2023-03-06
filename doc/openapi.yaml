@@ -504,7 +504,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/dish/restaurant/{restaurant_id}:
+  /management/dish/byRestaurant/{restaurant_id}:
     get:
       description: 一人のオーナーが複数の店舗を経営している可能性を考慮し、restaurant_idをパラメータとして追加している。
       tags:
@@ -772,7 +772,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/seat/restaurant/{restaurant_id}:
+  /management/seat/byRestaurant/{restaurant_id}:
     get:
       tags:
         - management
@@ -1051,7 +1051,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/order/restaurant/{restaurant_id}:
+  /management/order/byRestaurant/{restaurant_id}:
     get:
       tags:
         - management
@@ -1116,7 +1116,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/order/restaurant/{restaurant_id}/unserved:
+  /management/order/byRestaurant/{restaurant_id}/unserved:
     get:
       tags:
         - management
@@ -1283,7 +1283,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/order/ordered_dish/{ordered_dish_id}/cancel:
+  /management/byOrderedDish/{ordered_dish_id}/cancel:
     put:
       tags:
         - management
@@ -1314,7 +1314,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/order/ordered_dish/{ordered_dish_id}/deliver:
+  /management/order/byOrderedDish/{ordered_dish_id}/deliver:
     put:
       tags:
         - management
@@ -1345,7 +1345,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /customer/menu:
+  /customer/dish:
     get:
       tags:
         - customer
@@ -1396,7 +1396,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /customer/menu/{dish_id}:
+  /customer/dish/{dish_id}:
     get:
       tags:
         - customer
