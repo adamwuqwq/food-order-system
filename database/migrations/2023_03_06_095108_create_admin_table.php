@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->string('admin_name');
             $table->string('login_id')->unique();
             $table->string('hashed_password');
-            $table->bigInteger('restaurant_id')->unsigned()->default(0);
             $table->enum('admin_role', ['system', 'owner', 'counter', 'kitchen'])->default('counter');
             $table->timestamps();
         });
