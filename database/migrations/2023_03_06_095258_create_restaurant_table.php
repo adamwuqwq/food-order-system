@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('restaurants', function (Blueprint $table) {
             $table->bigIncrements('restaurant_id');
             $table->string('restaurant_name')->unique();
-            $table->bigInteger('owner_admin_id')->unsigned()->default(0);
             $table->string('restaurant_address')->nullable();
             $table->string('restaurant_image_url')->nullable();
             $table->timestamps();
-            $table->foreign('owner_admin_id')->references('admin_id')->on('admins');
         });
     }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Restaurants extends Model
 {
@@ -15,7 +16,6 @@ class Restaurants extends Model
 
     protected $fillable = [
         'restaurant_name',
-        'restaurant_admin_id',
         'restaurant_address',
         'restaurant_image_url',
     ];
@@ -24,4 +24,29 @@ class Restaurants extends Model
         'restaurant_address' => null,
         'restaurant_image_url' => null,
     ];
+
+    public function orderedDishes(): HasMany
+    {
+        return $this->hasMany(OrderedDishes::class, 'restaurant_id', 'restaurant_id');
+    }
+
+    public function dishes(): HasMany
+    {
+        return $this->hasMany(Dishes::class, 'restaurant_id', 'restaurant_id');
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Orders::class, 'restaurant_id', 'restaurant_id');
+    }
+
+    public function seats(): HasMany
+    {
+        return $this->hasMany(Seats::class, 'restaurant_id', 'restaurant_id');
+    }
+
+    public function adminRestaurantRelationships(): HasMany
+    {
+        return $this->hasMany(AdminRestaurantRelationships::class, 'restaurant_id', 'restaurant_id');
+    }
 }

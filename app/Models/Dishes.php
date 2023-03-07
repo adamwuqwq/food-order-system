@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dishes extends Model
 {
@@ -30,4 +32,14 @@ class Dishes extends Model
         'dish_price' => 0,
         'dish_description' => null,
     ];
+
+    public function restaurants(): BelongsTo
+    {
+        return $this->belongsTo(Restaurants::class, 'restaurant_id', 'restaurant_id');
+    }
+
+    public function orderedDishes(): HasMany
+    {
+        return $this->hasMany(OrderedDishes::class, 'dish_id', 'dish_id');
+    }
 }
