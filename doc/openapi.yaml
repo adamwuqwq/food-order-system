@@ -1165,6 +1165,19 @@ paths:
           description: Unauthorized (トークンが無効)
         "403":
           description: Permission Denied (owner, counter, kitchenは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 未提供料理一覧を取得したい店舗のID
       security:
         - bearerAuth: []
 
@@ -1257,7 +1270,7 @@ paths:
         - management
       description: 注文状態(is_paid)、座席のQRコードトークンを更新する。
       summary: (会計済みボタン) 注文を完了する
-      operationId: orderGet
+      operationId: orderPut
       responses:
         "200":
           description: OK
@@ -1283,7 +1296,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/byOrderedDish/{ordered_dish_id}/cancel:
+  /management/order/byOrderedDish/{ordered_dish_id}/cancel:
     put:
       tags:
         - management

@@ -24,3 +24,8 @@ Homestead.json
 
 # MacOS
 .DS_Store
+
+# Open API generator
+/.openapi-generator
+.openapi-generator-ignore
+/oapi_generated
