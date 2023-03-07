@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigInteger('dish_id')->unsigned();
             $table->integer('quantity')->default(0);
             $table->boolean('is_delivered')->default(false);
+            $table->boolean('is_canceled')->default(false);
             $table->timestamps();
             $table->foreign('order_id')->references('order_id')->on('orders');
             $table->foreign('dish_id')->references('dish_id')->on('dishes');
