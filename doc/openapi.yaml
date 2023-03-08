@@ -39,14 +39,14 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                login_id:
                   type: string
                   description: ログイン用ユーザーID
                 password:
                   type: string
                   description: ログイン用パスワード
               required:
-                - username
+                - login_id
                 - password
       parameters: []
 
@@ -75,7 +75,7 @@ paths:
                           type: string
                         owner_admin_id:
                           type: integer
-                        owner_name:
+                        restaurant_image_url:
                           type: string
         "401":
           description: Unauthorized (トークンが無効)
@@ -125,6 +125,10 @@ paths:
                 restaurant_name:
                   type: string
                   description: 店舗の名称
+                restaurant_address:
+                  type: string
+                restaurant_image_url:
+                  type: string
               required:
                 - admin_owner_id
                 - restaurant_name
@@ -164,6 +168,10 @@ paths:
                   owner_name:
                     type: string
                     description: オーナーの名前
+                  restaurant_address:
+                    type: string
+                  restaurant_image_url:
+                    type: string
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -212,6 +220,10 @@ paths:
                 owner_admin_id:
                   type: integer
                   description: オーナーの管理者ID
+                restaurant_address:
+                  type: string
+                restaurant_image_url:
+                  type: string
       parameters:
         - schema:
             type: string
@@ -281,7 +293,7 @@ paths:
                           type: integer
                         name:
                           type: string
-                        username:
+                        login_id:
                           type: string
                         restaurants_id:
                           type: array
@@ -338,21 +350,23 @@ paths:
                 admin_name:
                   type: string
                   description: 管理者名前
-                username:
+                login_id:
                   type: string
                   description: ログイン用ユーザーID
                 password:
                   type: string
                   description: ログイン用パスワード
-                restaurant_id:
-                  type: integer
+                restaurants_id:
+                  type: array
+                  items:
+                    type: integer
                   description: 所属している店舗のID
                 admin_role:
                   type: string
                   description: 管理者のロール(owner, counter, kitchen)
               required:
                 - admin_name
-                - username
+                - login_id
                 - password
                 - admin_role
       parameters:
@@ -385,7 +399,7 @@ paths:
                   name:
                     type: string
                     description: 管理者名前
-                  username:
+                  login_id:
                     type: string
                     description: ログイン用ユーザーID
                   restaurants_id:
@@ -452,12 +466,11 @@ paths:
                 password:
                   type: string
                   description: ログイン用パスワード
-                restaurant_id:
-                  type: integer
+                restaurants_id:
+                  type: array
+                  items:
+                    type: integer
                   description: 所属している店舗のID
-                admin_role:
-                  type: string
-                  description: 管理者のロール(owner, counter, kitchen)
       parameters:
         - schema:
             type: string
