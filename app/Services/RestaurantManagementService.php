@@ -94,15 +94,9 @@ class RestaurantManagementService
         $restaurant = Restaurants::find($restaurantId);
 
         // 店舗のデータを更新
-        if (array_key_exists('restaurant_name', $restaurantData)) {
-            $restaurant->restaurant_name = $restaurantData['restaurant_name'];
-        }
-        if (array_key_exists('restaurant_address', $restaurantData)) {
-            $restaurant->restaurant_address = $restaurantData['restaurant_address'];
-        }
-        if (array_key_exists('restaurant_image_url', $restaurantData)) {
-            $restaurant->restaurant_image_url = $restaurantData['restaurant_image_url'];
-        }
+        $restaurant->restaurant_name = $restaurantData['restaurant_name'] ?? $restaurant->restaurant_name;
+        $restaurant->restaurant_address = $restaurantData['restaurant_address'] ?? $restaurant->restaurant_address;
+        $restaurant->restaurant_image_url = $restaurantData['restaurant_image_url'] ?? $restaurant->restaurant_image_url;
 
         $isSaved = $restaurant->save();
 

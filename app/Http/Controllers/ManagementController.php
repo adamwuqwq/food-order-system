@@ -130,7 +130,7 @@ class ManagementController extends Controller
     }
 
     /**
-     * 管理者アカウント(owner, counter, kitchen)情報編集.
+     * 管理者アカウント(owner, counter, kitchen)情報編集
      * @param string $adminId 編集したい管理者アカウントのID (required)
      * @return \Illuminate\Http\JSONResponse
      */
@@ -165,6 +165,7 @@ class ManagementController extends Controller
             return response()->json(['error' => '管理者アカウントの編集に失敗しました'], 500);
         }
     }
+
 
     /**
      * 店舗の一覧取得 (owner, counter, kitchenは自分の店舗のみ取得可能).
@@ -321,115 +322,120 @@ class ManagementController extends Controller
     }
 
 
-
-
     /**
-     * Operation menuCreate
-     *
-     * メニューに料理を追加(新規作成).
-     *
+     * メニューに料理を追加(新規作成)
      * @param string $restaurantId 料理を追加したい店舗のID (required)
-     *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
-    public function menuCreate($restaurantId)
+    public function menuCreate(Request $request, string $restaurantId)
     {
-        //  $input = Request::all();
+        // 指定した店舗存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
 
-        //path params validation
+        // リクエストボディのバリデーション (400エラーを返す)
+        try {
+            $request->validate([
+                'dish_name' => 'required|string',
+                'dish_category' => 'string',
+                'dish_price' => 'required|integer',
+                'available_num' => 'required|integer',
+                'image_url' => 'string',
+                'dish_description' => 'string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
+        }
 
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、追加可否を判定 (403エラーを返す)
 
-        //not path params validation
+        // リクエストボディから料理情報を取得
+        $dishInfo = json_decode($request->getContent(), true);
 
-        return response('How about implementing menuCreate as a post method ?');
+        // 料理を追加 (追加に失敗した場合は、500エラーを返す)
+        try {
+            $dishId = DishManagementService::createDish($dishInfo, $restaurantId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '料理の追加に失敗しました'], 500);
+        }
+
+        return response()->json(['dish_id' => $dishId], 200);
     }
+    
     /**
-     * Operation menuList
-     *
-     * 料理メニューの一覧取得.
-     *
+     * 料理メニューの一覧取得
      * @param string $restaurantId メニューの一覧を取得したい店舗のID (required)
-     *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function menuList($restaurantId)
     {
-        //  $input = Request::all();
+        // 指定した店舗存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
 
-        //path params validation
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
 
-
-        //not path params validation
-
-        return response('How about implementing menuList as a get method ?');
+        return response()->json(DishManagementService::getDishList($restaurantId), 200);
     }
+
     /**
      * Operation dishDelete
-     *
-     * 料理の削除.
-     *
-     * @param int $dishId 削除したい料理のID (required)
-     *
-     * @return Http response
+     * @param string $dishId 削除したい料理のID (required)
+     * @return \Illuminate\Http\JSONResponse
      */
-    public function dishDelete($dishId)
+    public function dishDelete(string $dishId)
     {
-        //  $input = Request::all();
+        // 指定した料理存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!DishManagementService::isExist($dishId)) {
+            return response()->json(['error' => '指定した料理は存在しません'], 400);
+        }
 
-        //path params validation
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
 
+        // 料理を削除 (削除に失敗した場合は、500エラーを返す)
+        try {
+            DishManagementService::deleteDish($dishId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '料理の削除に失敗しました'], 500);
+        }
 
-        //not path params validation
-
-        return response('How about implementing dishDelete as a delete method ?');
+        return response()->json(['message' => '料理を削除しました'], 200);
     }
+
     /**
-     * Operation dishGet
-     *
-     * 指定した料理情報取得.
-     *
-     * @param int $dishId 情報取得したい料理のID (required)
-     *
-     * @return Http response
+     * 指定した料理情報取得
+     * @param string $dishId 情報取得したい料理のID (required)
+     * @return \Illuminate\Http\JSONResponse
      */
     public function dishGet($dishId)
     {
-        //  $input = Request::all();
+        // 指定した料理存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!DishManagementService::isExist($dishId)) {
+            return response()->json(['error' => '指定した料理は存在しません'], 400);
+        }
 
-        //path params validation
-
-
-        //not path params validation
-
-        return response('How about implementing dishGet as a get method ?');
+        return response()->json(DishManagementService::getDishInfo($dishId), 200);
     }
+
     /**
-     * Operation dishModify
-     *
-     * 料理情報編集.
-     *
+     * 料理情報編集
      * @param int $dishId 編集したい料理のID (required)
-     *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function dishModify($dishId)
     {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-
-        return response('How about implementing dishModify as a put method ?');
     }
+
+
     /**
      * Operation adminLogin
      *
      * 管理者(system, owner, counter, kitchen)ログイン.
      *
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function adminLogin()
     {
@@ -451,7 +457,7 @@ class ManagementController extends Controller
      *
      * @param int $orderedDishId キャンセルしたい料理の注文ID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function orderedDishCancel($orderedDishId)
     {
@@ -471,7 +477,7 @@ class ManagementController extends Controller
      *
      * @param int $orderedDishId 注文した料理の注文ID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function orderedDishDelivery($orderedDishId)
     {
@@ -491,7 +497,7 @@ class ManagementController extends Controller
      *
      * @param int $restaurantId 注文一覧を取得したい店舗のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function orderList($restaurantId)
     {
@@ -511,7 +517,7 @@ class ManagementController extends Controller
      *
      * @param int $restaurantId 未提供料理一覧を取得したい店舗のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function unservedDishList($restaurantId)
     {
@@ -531,7 +537,7 @@ class ManagementController extends Controller
      *
      * @param int $orderId 注文詳細を取得したい注文のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function orderGet($orderId)
     {
@@ -551,7 +557,7 @@ class ManagementController extends Controller
      *
      * @param int $orderId 注文のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function orderPut($orderId)
     {
@@ -571,7 +577,7 @@ class ManagementController extends Controller
      *
      * @param int $restaurantId 座席を追加したい店舗のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatAdd($restaurantId)
     {
@@ -591,7 +597,7 @@ class ManagementController extends Controller
      *
      * @param int $restaurantId 座席情報を取得したい店舗のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatList($restaurantId)
     {
@@ -611,7 +617,7 @@ class ManagementController extends Controller
      *
      * @param int $seatId 削除したい座席のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatDelete($seatId)
     {
@@ -631,7 +637,7 @@ class ManagementController extends Controller
      *
      * @param int $seatId 編集したい座席のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatEdit($seatId)
     {
@@ -651,7 +657,7 @@ class ManagementController extends Controller
      *
      * @param int $seatId 座席情報を取得したい座席のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatInfo($seatId)
     {
@@ -671,7 +677,7 @@ class ManagementController extends Controller
      *
      * @param int $seatId QRコードトークンを再発行したい座席のID (required)
      *
-     * @return Http response
+     * @return \Illuminate\Http\JSONResponse
      */
     public function seatRefresh($seatId)
     {

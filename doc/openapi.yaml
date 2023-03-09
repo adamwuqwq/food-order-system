@@ -554,12 +554,15 @@ paths:
                               image_url:
                                 type: string
                                 description: 料理画像のURL
-                              price:
+                              dish_price:
                                 type: integer
                                 description: 料理の価格
                               available_num:
                                 type: integer
                                 description: 料理の在庫数
+                              dish_description:
+                                type: string
+                                description: 料理の説明
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -621,7 +624,7 @@ paths:
                       dish_category:
                         type: string
                         description: 料理の種類
-                      price:
+                      dish_price:
                         type: integer
                         description: 料理の値段
                       available_num:
@@ -630,9 +633,12 @@ paths:
                       image_url:
                         type: string
                         description: 料理の画像
+                      dish_description:
+                        type: string
+                        description: 料理の説明
                     required:
                       - dish_name
-                      - price
+                      - dish_price
                       - available_num
       parameters:
         - schema:
@@ -673,7 +679,7 @@ paths:
                   dish_category:
                     type: string
                     description: 料理の種類
-                  price:
+                  dish_price:
                     type: integer
                     description: 料理の値段
                   available_num:
@@ -682,6 +688,9 @@ paths:
                   image_url:
                     type: string
                     description: 料理の画像
+                  dish_description:
+                    type: string
+                    description: 料理の説明
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -730,7 +739,7 @@ paths:
                 dish_category:
                   type: string
                   description: 料理の種類
-                price:
+                dish_price:
                   type: integer
                   description: 料理の値段
                 available_num:
@@ -739,6 +748,9 @@ paths:
                 image_url:
                   type: string
                   description: 料理の画像
+                dish_description:
+                  type: string
+                  description: 料理の説明
       parameters:
         - schema:
             type: string
@@ -1404,7 +1416,7 @@ paths:
                           image_url:
                             type: string
                             description: 料理画像のURL
-                          price:
+                          dish_price:
                             type: integer
                             description: 料理の価格
                           available_num:
@@ -1445,7 +1457,7 @@ paths:
                   image_url:
                     type: string
                     description: 料理画像のURL
-                  price:
+                  dish_price:
                     type: integer
                     description: 料理の価格
                   available_num:

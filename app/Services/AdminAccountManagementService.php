@@ -58,7 +58,7 @@ class AdminAccountManagementService
         foreach ($restaurantIds as $restaurantId) {
             $restaurants[] = RestaurantManagementService::getRestaurantInfo($restaurantId);
         }
-        
+
         return $restaurants ?? [];
     }
 
@@ -102,15 +102,9 @@ class AdminAccountManagementService
         }
 
         // 管理者アカウントの情報を更新
-        if (array_key_exists('admin_name', $adminData)) {
-            $admin->admin_name = $adminData['admin_name'];
-        }
-        if (array_key_exists('login_id', $adminData)) {
-            $admin->login_id = $adminData['login_id'];
-        }
-        if (array_key_exists('password', $adminData)) {
-            $admin->hashed_password = self::hashPassword($adminData['password']);
-        }
+        $admin->admin_name = $adminData['admin_name'] ?? $admin->admin_name;
+        $admin->login_id = $adminData['login_id'] ?? $admin->login_id;
+        $admin->hashed_password = isset($adminData['password']) ? self::hashPassword($adminData['password']) : $admin->hashed_password;
 
         // 店舗とのリレーションを更新
         try {
