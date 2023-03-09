@@ -17,6 +17,7 @@ class AdminRestaurantRelationships extends Model
     protected $fillable = [
         'admin_id',
         'restaurant_id',
+        'admin_role',
     ];
 
     public function admins(): BelongsTo

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('relationship_id');
             $table->bigInteger('admin_id')->unsigned();
             $table->bigInteger('restaurant_id')->unsigned();
+            $table->enum('admin_role', ['system', 'owner', 'counter', 'kitchen']);
             $table->timestamps();
             $table->foreign('admin_id')->references('admin_id')->on('admins');
             $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');

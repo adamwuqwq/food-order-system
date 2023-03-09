@@ -37,18 +37,23 @@ class RestaurantManagementService
     /**
      * 店舗のオーナー情報取得
      * @param string $restaurantId 店舗ID
-     * @return Admins オーナーの情報
+     * @return Admins|null オーナーの情報
      */
     public static function getOwner(string $restaurantId)
     {
-        return AdminRestaurantRelationships::where('restaurant_id', $restaurantId)->admins()->first();
+        $owner = AdminRestaurantRelationships::where('restaurant_id', $restaurantId)->where('admin_role', "owner")->first();
+
+        if ($owner !== null) {
+            return Admins::find($owner->admin_id);
+        }
+        return null;
     }
 
     /**
      * 店舗の新規作成
      * @param array $restaurantData 店舗情報
      * @return string 作成された店舗のID
-     * @throws Exception 作成に失敗した
+     * @throws \Exception 作成に失敗した
      */
     public static function createRestaurant(array $restaurantData)
     {
@@ -69,13 +74,13 @@ class RestaurantManagementService
         if (array_key_exists('owner_admin_id', $restaurantData)) {
             // オーナー権限がないユーザーが指定された場合は、例外を投げる
             if (Admins::find($restaurantData['owner_admin_id'])->admin_role !== 'owner') {
-                throw new Exception('オーナー権限がないユーザーが指定されました');
+                throw new \Exception('オーナー権限がないユーザーが指定されました');
             }
 
-            RelationshipManagementService::createRelationship(Admins::find($restaurantData['owner_admin_id']), $restaurant->id);
+            RelationshipManagementService::createRelationship(Admins::find($restaurantData['owner_admin_id']), array($restaurant->restaurant_id));
         }
 
-        return $restaurant->id;
+        return $restaurant->restaurant_id;
     }
 
     /**
@@ -99,6 +104,8 @@ class RestaurantManagementService
             $restaurant->restaurant_image_url = $restaurantData['restaurant_image_url'];
         }
 
+        $isSaved = $restaurant->save();
+
         // オーナーと店舗のリレイションを更新
         try {
             if (array_key_exists('owner_admin_id', $restaurantData)) {
@@ -107,7 +114,7 @@ class RestaurantManagementService
 
                 // オーナー権限がないユーザーが指定された場合は、例外を投げる
                 if ($newOwner->admin_role !== 'owner') {
-                    throw new Exception('オーナー権限がないユーザーが指定されました');
+                    throw new \Exception('オーナー権限がないユーザーが指定されました');
                 }
 
                 // 元のオーナーの権限を削除
@@ -116,13 +123,13 @@ class RestaurantManagementService
                 }
 
                 // 新しいオーナーの権限を追加
-                RelationshipManagementService::createRelationship($newOwner, array($restaurant->id));
+                RelationshipManagementService::createRelationship($newOwner, array($restaurant->restaurant_id));
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 
-        return $restaurant->save();
+        return $isSaved;
     }
 
     /**
@@ -133,14 +140,24 @@ class RestaurantManagementService
     public static function deleteRestaurant(string $restaurantId)
     {
         $restaurant = Restaurants::find($restaurantId);
+        $owner = self::getOwner($restaurantId);
 
         // オーナーと店舗のリレイションを削除
-        $owner = self::getOwner($restaurantId);
         if ($owner != null) {
             RelationshipManagementService::deleteRelationship($owner, $restaurant);
         }
 
         // 店舗のデータを削除
         return $restaurant->delete();
+    }
+
+    /**
+     * 店舗が存在するかをチェック
+     * @param string $restaurantId 店舗ID
+     * @return bool false:存在しない true:存在する
+     */
+    public static function isExist(string $restaurantId)
+    {
+        return Restaurants::find($restaurantId) != null;
     }
 }

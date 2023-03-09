@@ -6,7 +6,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use \Illuminate\Validation\ValidationException;
 use App\Services\AdminAccountManagementService;
-use App\Services\RelationshipManagementService;
 use App\Services\RestaurantManagementService;
 use App\Services\MenuManagementService;
 use App\Services\DishManagementService;
@@ -29,13 +28,25 @@ class ManagementController extends Controller
     {
         // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
 
-        $admins = AdminAccountManagementService::getAdminList();
+        try {
+            $admins = AdminAccountManagementService::getAdminList();
+
+            // アカウント毎のrestaurant_idとrestaurant_nameを取得し、レスポンスに追加
+            foreach ($admins as $admin) {
+                $restaurants = AdminAccountManagementService::getRelatedRestaurant($admin->admin_id);
+                $admin['restaurant_id'] =  array_column($restaurants, 'restaurant_id');
+                $admin['restaurant_name'] = array_column($restaurants, 'restaurant_name');
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => '管理者アカウントの一覧取得に失敗しました'], 500);
+        }
 
         return response()->json($admins, 200);
     }
 
     /**
      * 新規管理者アカウント(owner, counter, kitchen)発行
+     * @param Request $request リクエストボディ
      * @return \Illuminate\Http\JSONResponse
      */
     public function adminSignUp(Request $request)
@@ -56,22 +67,24 @@ class ManagementController extends Controller
 
         $adminInfo = json_decode($request->getContent(), true);
 
-        // TODO: 店舗が存在するかをチェック (存在しない場合は、400エラーを返す)
-
         // TODO: Autherizationヘッダーを使って管理者ロールを取得、発行可否を判定 (403エラーを返す)
 
-        $adminId = AdminAccountManagementService::createAdmin($adminInfo);
+        // 管理者アカウントを作成 (作成に失敗した場合は、500エラーを返す)
+        try {
+            $adminId = AdminAccountManagementService::createAdmin($adminInfo);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '管理者アカウントの作成に失敗しました'], 500);
+        }
 
         return response()->json(['admin_id' => $adminId], 200);
     }
 
-
     /**
      * 管理者アカウント(owner, counter, kitchen)削除
-     * @param int $adminId 削除したい管理者アカウントのID (required)
+     * @param string $adminId 削除したい管理者アカウントのID (required)
      * @return \Illuminate\Http\JSONResponse
      */
-    public function adminDelete($adminId)
+    public function adminDelete(string $adminId)
     {
         // 指定した管理者存在するかをチェック (存在しない場合は、400エラーを返す)
         if (!AdminAccountManagementService::isExist($adminId)) {
@@ -90,10 +103,10 @@ class ManagementController extends Controller
 
     /**
      * 管理者アカウント情報取得
-     * @param int $adminId 情報取得したい管理者アカウントのID (required)
+     * @param string $adminId 情報取得したい管理者アカウントのID (required)
      * @return \Illuminate\Http\JSONResponse
      */
-    public function adminGet($adminId)
+    public function adminGet(string $adminId)
     {
         // 指定した管理者存在するかをチェック (存在しない場合は、400エラーを返す)
         if (!AdminAccountManagementService::isExist($adminId)) {
@@ -105,6 +118,11 @@ class ManagementController extends Controller
         // 管理者アカウントを取得 (取得に失敗した場合は、500エラーを返す)
         $admin = AdminAccountManagementService::getAdminInfo($adminId);
         if ($admin) {
+            // アカウント毎のrestaurant_idとrestaurant_nameを取得し、レスポンスに追加
+            $restaurants = AdminAccountManagementService::getRelatedRestaurant($admin->admin_id);
+            $admin['restaurant_id'] =  array_column($restaurants, 'restaurant_id');
+            $admin['restaurant_name'] = array_column($restaurants, 'restaurant_name');
+            
             return response()->json($admin, 200);
         } else {
             return response()->json(['error' => '管理者アカウントの取得に失敗しました'], 500);
@@ -113,7 +131,7 @@ class ManagementController extends Controller
 
     /**
      * 管理者アカウント(owner, counter, kitchen)情報編集.
-     * @param int $adminId 編集したい管理者アカウントのID (required)
+     * @param string $adminId 編集したい管理者アカウントのID (required)
      * @return \Illuminate\Http\JSONResponse
      */
     public function adminModify(Request $request, string $adminId)
@@ -142,11 +160,168 @@ class ManagementController extends Controller
 
         // 管理者アカウントを編集 (編集に失敗した場合は、500エラーを返す)
         if (AdminAccountManagementService::editAdmin($adminId, $adminInfo)) {
-            return response()->json(['message' => '管理者アカウントを編集しました'], 200);
+            return response()->json(['message' => '管理者アカウントを変更しました'], 200);
         } else {
             return response()->json(['error' => '管理者アカウントの編集に失敗しました'], 500);
         }
     }
+
+    /**
+     * 店舗の一覧取得 (owner, counter, kitchenは自分の店舗のみ取得可能).
+     * @return \Illuminate\Http\JSONResponse
+     */
+    public function restaurantList()
+    {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 店舗の一覧を取得 (取得に失敗した場合は、500エラーを返す)
+        try {
+            $restaurants = RestaurantManagementService::getRestaurantList();
+            // 店舗毎のowner_admin_idを取得し、レスポンスに追加
+            foreach ($restaurants as $restaurant) {
+                $owner = RestaurantManagementService::getOwner($restaurant->restaurant_id);
+                if ($owner !== null) {
+                    $restaurant['owner_admin_id'] = $owner->admin_id;
+                } else {
+                    $restaurant['owner_admin_id'] = null;
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => '店舗の一覧取得に失敗しました'], 500);
+        }
+
+        return response()->json($restaurants, 200);
+    }
+
+    /**
+     * 新規店舗登録
+     * @param Request $request リクエストボディ
+     * @return \Illuminate\Http\JSONResponse
+     */
+    public function restaurantSignUp(Request $request)
+    {
+        // リクエストボディのバリデーション (400エラーを返す)
+        try {
+            $request->validate([
+                'restaurant_name' => 'required|string',
+                'owner_admin_id' => 'integer',
+                'restaurant_address' => 'string',
+                'restaurant_image_url' => 'string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
+        }
+
+        $restaurantInfo = json_decode($request->getContent(), true);
+
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、発行可否を判定 (403エラーを返す)
+
+        // 店舗を作成 (作成に失敗した場合は、500エラーを返す)
+        try {
+            $restaurantId = RestaurantManagementService::createRestaurant($restaurantInfo);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '店舗の作成に失敗しました'], 500);
+        }
+
+        return response()->json(['restaurant_id' => $restaurantId], 200);
+    }
+
+    /**
+     * 店舗の削除
+     * @param string $restaurantId 削除したい店舗のID (required)
+     * @return \Illuminate\Http\JSONResponse
+     */
+    public function restaurantDelete(string $restaurantId)
+    {
+        // 指定した店舗存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
+
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
+
+        // 店舗を削除 (削除に失敗した場合は、500エラーを返す)
+        try {
+            RestaurantManagementService::deleteRestaurant($restaurantId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '店舗の削除に失敗しました'], 500);
+        }
+
+        return response()->json(['message' => '店舗を削除しました'], 200);
+    }
+
+    /**
+     * 指定した店舗情報取得
+     * @param string $restaurantId 情報取得したい店舗のID (required)
+     * @return \Illuminate\Http\JSONResponse
+     */
+    public function restaurantGet(string $restaurantId)
+    {
+        // 指定した店舗存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
+
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
+
+        // 店舗情報を取得 (取得に失敗した場合は、500エラーを返す)
+        $restaurant = RestaurantManagementService::getRestaurantInfo($restaurantId);
+        if ($restaurant) {
+            // owner_admin_idを取得し、レスポンスに追加
+            $owner = RestaurantManagementService::getOwner($restaurant->restaurant_id);
+            if ($owner !== null) {
+                $restaurant['owner_admin_id'] = $owner->admin_id;
+            } else {
+                $restaurant['owner_admin_id'] = null;
+            }
+
+            return response()->json($restaurant, 200);
+        } else {
+            return response()->json(['error' => '店舗情報の取得に失敗しました'], 500);
+        }
+    }
+
+    /**
+     * 店舗情報編集
+     * @param Request $request リクエストボディ
+     * @param string $restaurantId 情報編集したい店舗のID (required)
+     * @return \Illuminate\Http\JSONResponse
+     */
+    public function restaurantModify(Request $request, string $restaurantId)
+    {
+        // リクエストボディのバリデーション (400エラーを返す)
+        try {
+            $request->validate([
+                'restaurant_name' => 'string',
+                'owner_admin_id' => 'integer',
+                'restaurant_address' => 'string',
+                'restaurant_image_url' => 'string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
+        }
+
+        $restaurantInfo = json_decode($request->getContent(), true);
+
+        // 指定した店舗存在するかをチェック (存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
+
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
+
+        // 店舗情報を編集 (編集に失敗した場合は、500エラーを返す)
+        try {
+            RestaurantManagementService::editRestaurant($restaurantId, $restaurantInfo);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '店舗情報の編集に失敗しました'], 500);
+        }
+
+        return response()->json(['message' => '店舗情報を変更しました'], 200);
+    }
+
+
+
 
     /**
      * Operation menuCreate
@@ -388,116 +563,6 @@ class ManagementController extends Controller
         //not path params validation
 
         return response('How about implementing orderPut as a put method ?');
-    }
-    /**
-     * Operation restaurantList
-     *
-     * 店舗の一覧取得 (ownerは自分の店舗のみ取得可能).
-     *
-     *
-     * @return Http response
-     */
-    public function restaurantList()
-    {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-        if (!isset($input['authorization'])) {
-            throw new \InvalidArgumentException('Missing the required parameter $authorization when calling restaurantList');
-        }
-        // $authorization = $input['authorization'];
-
-
-        return response('How about implementing restaurantList as a get method ?');
-    }
-    /**
-     * Operation restaurantSignUp
-     *
-     * 新規店舗登録.
-     *
-     *
-     * @return Http response
-     */
-    public function restaurantSignUp()
-    {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-        if (!isset($input['authorization'])) {
-            throw new \InvalidArgumentException('Missing the required parameter $authorization when calling restaurantSignUp');
-        }
-        // $authorization = $input['authorization'];
-
-        // $restaurantSignUpRequest = $input['restaurantSignUpRequest'];
-
-
-        return response('How about implementing restaurantSignUp as a post method ?');
-    }
-    /**
-     * Operation restaurantDelete
-     *
-     * 店舗の削除.
-     *
-     * @param int $restaurantId 削除したい店舗のID (required)
-     *
-     * @return Http response
-     */
-    public function restaurantDelete($restaurantId)
-    {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-
-        return response('How about implementing restaurantDelete as a delete method ?');
-    }
-    /**
-     * Operation restaurantGet
-     *
-     * 指定した店舗情報取得.
-     *
-     * @param int $restaurantId 情報取得したい店舗のID (required)
-     *
-     * @return Http response
-     */
-    public function restaurantGet($restaurantId)
-    {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-
-        return response('How about implementing restaurantGet as a get method ?');
-    }
-    /**
-     * Operation restaurantModify
-     *
-     * 店舗情報編集.
-     *
-     * @param int $restaurantId 情報編集したい店舗のID (required)
-     *
-     * @return Http response
-     */
-    public function restaurantModify($restaurantId)
-    {
-        //  $input = Request::all();
-
-        //path params validation
-
-
-        //not path params validation
-
-        return response('How about implementing restaurantModify as a put method ?');
     }
     /**
      * Operation seatAdd

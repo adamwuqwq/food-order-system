@@ -52,7 +52,14 @@ class AdminAccountManagementService
      */
     public static function getRelatedRestaurant(string $adminId)
     {
-        return AdminRestaurantRelationships::find($adminId)->restaurants()->get();
+        $restaurantIds = Admins::find($adminId)->adminRestaurantRelationships()->get()->pluck('restaurant_id')->toArray();
+        
+        // 店舗情報取得
+        foreach ($restaurantIds as $restaurantId) {
+            $restaurants[] = RestaurantManagementService::getRestaurantInfo($restaurantId);
+        }
+        
+        return $restaurants ?? [];
     }
 
     /**
@@ -111,8 +118,7 @@ class AdminAccountManagementService
                 RelationshipManagementService::deleteRelationship($admin);
                 RelationshipManagementService::createRelationship($admin, $adminData['restaurant_id']);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 
@@ -153,14 +159,14 @@ class AdminAccountManagementService
     public static function isExist(?string $adminId = null, ?string $loginId = null)
     {
         $query = Admins::where('admin_id', $adminId);
-    
+
         if ($adminId != null) {
             $query->where('admin_id', $adminId);
         }
         if ($loginId !== null) {
             $query->where('login_id', $loginId);
         }
-    
+
         return $query->exists();
     }
 }

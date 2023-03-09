@@ -26,6 +26,7 @@ class RelationshipManagementService
                 $relationship = new AdminRestaurantRelationships();
                 $relationship->admin_id = $admin->admin_id;
                 $relationship->restaurant_id = $id;
+                $relationship->admin_role = $admin->admin_role;
                 $relationship->save();
             }
         }
