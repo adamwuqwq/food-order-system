@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Restaurants;
 use App\Models\Admins;
+use App\Models\Dishes;
 use App\Models\AdminRestaurantRelationships;
 use App\Services\RelationshipManagementService;
 use Illuminate\Database\Eloquent\Collection;
@@ -72,8 +73,14 @@ class RestaurantManagementService
 
         // オーナーが指定されている場合は、オーナーと店舗のリレイションを作成
         if (array_key_exists('owner_admin_id', $restaurantData)) {
-            // オーナー権限がないユーザーが指定された場合は、例外を投げる
-            if (Admins::find($restaurantData['owner_admin_id'])->admin_role !== 'owner') {
+            $admin = Admins::find($restaurantData['owner_admin_id']);
+
+            // 例外を投げる
+            if ($admin == null) {
+                Restaurants::destroy($restaurant->restaurant_id);
+                throw new \Exception('存在しないユーザーが指定されました');
+            }
+            if ($admin->admin_role !== 'owner') {
                 throw new \Exception('オーナー権限がないユーザーが指定されました');
             }
 
@@ -101,12 +108,15 @@ class RestaurantManagementService
         $isSaved = $restaurant->save();
 
         // オーナーと店舗のリレイションを更新
-        try {
-            if (array_key_exists('owner_admin_id', $restaurantData)) {
+        if (array_key_exists('owner_admin_id', $restaurantData)) {
+            try {
                 $newOwner = Admins::find($restaurantData['owner_admin_id']);
                 $oldOwner = self::getOwner($restaurantId);
 
-                // オーナー権限がないユーザーが指定された場合は、例外を投げる
+                // 例外を投げる
+                if ($newOwner == null) {
+                    throw new \Exception('存在しないユーザーが指定されました');
+                }
                 if ($newOwner->admin_role !== 'owner') {
                     throw new \Exception('オーナー権限がないユーザーが指定されました');
                 }
@@ -118,11 +128,10 @@ class RestaurantManagementService
 
                 // 新しいオーナーの権限を追加
                 RelationshipManagementService::createRelationship($newOwner, array($restaurant->restaurant_id));
+            } catch (\Exception $e) {
+                return false;
             }
-        } catch (\Exception $e) {
-            return false;
         }
-
         return $isSaved;
     }
 
@@ -140,6 +149,9 @@ class RestaurantManagementService
         if ($owner != null) {
             RelationshipManagementService::deleteRelationship($owner, $restaurant);
         }
+
+        // 料理のデータを削除
+        Dishes::where('restaurant_id', $restaurantId)->delete();
 
         // 店舗のデータを削除
         return $restaurant->delete();

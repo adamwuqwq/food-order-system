@@ -53,7 +53,7 @@ class AdminAccountManagementService
     public static function getRelatedRestaurant(string $adminId)
     {
         $restaurantIds = Admins::find($adminId)->adminRestaurantRelationships()->get()->pluck('restaurant_id')->toArray();
-        
+
         // 店舗情報取得
         foreach ($restaurantIds as $restaurantId) {
             $restaurants[] = RestaurantManagementService::getRestaurantInfo($restaurantId);
@@ -66,7 +66,7 @@ class AdminAccountManagementService
      * 管理者アカウントの新規作成
      * @param array $adminData 管理者アカウント情報
      * @return string 新規作成した管理者アカウントのID
-     * @throws Exception 作成に失敗した
+     * @throws \Exception 作成に失敗した
      */
     public static function createAdmin(array $adminData)
     {
@@ -107,13 +107,13 @@ class AdminAccountManagementService
         $admin->hashed_password = isset($adminData['password']) ? self::hashPassword($adminData['password']) : $admin->hashed_password;
 
         // 店舗とのリレーションを更新
-        try {
-            if (array_key_exists('restaurant_id', $adminData)) {
+        if (array_key_exists('restaurant_id', $adminData)) {
+            try {
                 RelationshipManagementService::deleteRelationship($admin);
                 RelationshipManagementService::createRelationship($admin, $adminData['restaurant_id']);
+            } catch (\Exception $e) {
+                return false;
             }
-        } catch (\Exception $e) {
-            return false;
         }
 
         return $admin->save();
