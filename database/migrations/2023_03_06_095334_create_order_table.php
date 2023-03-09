@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
             $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
-            $table->foreign('seat_id')->references('seat_id')->on('seats');
+            $table->foreign('seat_id')->references('seat_id')->on('seats')->cascadeOnDelete();
         });
     }
 

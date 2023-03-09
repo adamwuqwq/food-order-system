@@ -905,6 +905,57 @@ paths:
       security:
         - bearerAuth: []
 
+
+  /management/seat/byRestaurant/{restaurant_id}/{seat_num}:
+    post:
+      tags:
+        - management
+      summary: 新規店舗の座席一括追加
+      operationId: multipleSeatAdd
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    seat_id: 
+                      type: integer
+                      description: 追加された座席のID
+                    qr_code_token:
+                      type: string
+                      description: 追加された座席のQRコードのトークン
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を追加可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 座席を追加したい店舗のID
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_num
+          description: 座席を追加したい店舗の座席数
+      security:
+        - bearerAuth: []
+
   /management/seat/{seat_id}:
     get:
       tags:
@@ -959,7 +1010,7 @@ paths:
     put:
       tags:
         - management
-      summary: 座席の編集 (編集後、自動QRコードトークン再発行)
+      summary: 座席の編集
       description: 空席 -> 使用不可に変更したい場合にも使える
       operationId: seatEdit
       responses:

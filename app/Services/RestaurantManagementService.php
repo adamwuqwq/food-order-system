@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Restaurants;
 use App\Models\Admins;
 use App\Models\Dishes;
+use App\Models\Seats;
+use App\Models\Orders;
+use App\Models\OrderedDishes;
 use App\Models\AdminRestaurantRelationships;
 use App\Services\RelationshipManagementService;
 use Illuminate\Database\Eloquent\Collection;
@@ -152,6 +155,15 @@ class RestaurantManagementService
 
         // 料理のデータを削除
         Dishes::where('restaurant_id', $restaurantId)->delete();
+
+        // 座席のデータを削除
+        Seats::where('restaurant_id', $restaurantId)->delete();
+
+        // 注文のデータを削除
+        Orders::where('restaurant_id', $restaurantId)->delete();
+
+        // 注文料理のデータを削除
+        OrderedDishes::where('restaurant_id', $restaurantId)->delete();
 
         // 店舗のデータを削除
         return $restaurant->delete();

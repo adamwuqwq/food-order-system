@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_canceled')->default(false);
             $table->timestamps();
             $table->foreign('order_id')->references('order_id')->on('orders');
-            $table->foreign('dish_id')->references('dish_id')->on('dishes');
+            $table->foreign('dish_id')->references('dish_id')->on('dishes')->cascadeOnDelete();
             $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
         });
     }
