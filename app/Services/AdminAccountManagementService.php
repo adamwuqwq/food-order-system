@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Admins;
+use App\Models\AdminRestaurantRelationships;
 use App\Services\RelationshipManagementService;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,7 +13,7 @@ class AdminAccountManagementService
 
     /**
      * パスワードのハッシュ化
-     * @param string パスワード
+     * @param string $password パスワード
      * @return string ハッシュ化されたパスワード
      */
     private static function hashPassword(string $password)
@@ -22,10 +23,10 @@ class AdminAccountManagementService
 
     /**
      * 管理者アカウントの一覧取得
-     * @param string 店舗ID(指定されている場合は、その店舗に所属しているアカウントのみ取得)
+     * @param string|null $restaurantID 店舗ID(指定されている場合は、その店舗に所属しているアカウントのみ取得)
      * @return Collection 管理者アカウント一覧
      */
-    public static function getAdminList(string $restaurantID = null)
+    public static function getAdminList(?string $restaurantID = null)
     {
         if ($restaurantID === null) {
             return Admins::get();
@@ -36,7 +37,7 @@ class AdminAccountManagementService
 
     /**
      * 管理者アカウントの情報取得
-     * @param string 管理者アカウントID
+     * @param string $adminId 管理者アカウントID
      * @return Admins 管理者アカウント情報
      */
     public static function getAdminInfo(string $adminId)
@@ -46,21 +47,21 @@ class AdminAccountManagementService
 
     /**
      * 管理者に関連する店舗情報取得
-     * @param string 管理者アカウントID
-     * @return \App\Models\AdminRestaurantRelationships 管理者と店舗のリレイション
+     * @param string $adminId 管理者アカウントID
+     * @return array 関連した店舗の情報(複数可)
      */
     public static function getRelatedRestaurant(string $adminId)
     {
-        $admin = Admins::find($adminId);
-        return $admin->adminRestaurantRelationships;
+        return AdminRestaurantRelationships::find($adminId)->restaurants()->get();
     }
 
     /**
      * 管理者アカウントの新規作成
-     * @param array 管理者アカウント情報
+     * @param array $adminData 管理者アカウント情報
      * @return string 新規作成した管理者アカウントのID
+     * @throws Exception 作成に失敗した
      */
-    public static function createAdmin($adminData)
+    public static function createAdmin(array $adminData)
     {
         // アカウント作成
         $admin = new Admins();
@@ -79,12 +80,12 @@ class AdminAccountManagementService
     }
 
     /**
-     * 管理者アカウントの情報編集
-     * @param string 管理者アカウントID
-     * @param array 管理者アカウント情報
+     * 管理者アカウントの情報更新
+     * @param string $adminId 管理者アカウントID
+     * @param array $adminData 管理者アカウント情報
      * @return bool false:失敗 true:成功
      */
-    public static function editAdmin($adminId, $adminData)
+    public static function editAdmin(string $adminId, array $adminData)
     {
         $admin = Admins::find($adminId);
 
@@ -93,7 +94,7 @@ class AdminAccountManagementService
             return false;
         }
 
-        // 管理者アカウントの情報を編集
+        // 管理者アカウントの情報を更新
         if (array_key_exists('admin_name', $adminData)) {
             $admin->admin_name = $adminData['admin_name'];
         }
@@ -104,9 +105,15 @@ class AdminAccountManagementService
             $admin->hashed_password = self::hashPassword($adminData['password']);
         }
 
-        // 店舗とのリレーションを編集
-        if (array_key_exists('restaurant_id', $adminData)) {
-            RelationshipManagementService::editRelationship($admin, $adminData['restaurant_id']);
+        // 店舗とのリレーションを更新
+        try {
+            if (array_key_exists('restaurant_id', $adminData)) {
+                RelationshipManagementService::deleteRelationship($admin);
+                RelationshipManagementService::createRelationship($admin, $adminData['restaurant_id']);
+            }
+        }
+        catch (\Exception $e) {
+            return false;
         }
 
         return $admin->save();
@@ -114,10 +121,10 @@ class AdminAccountManagementService
 
     /**
      * 管理者アカウントの削除
-     * @param string 管理者アカウントID
+     * @param string $adminId 管理者アカウントID
      * @return bool false:失敗 true:成功
      */
-    public static function deleteAdmin($adminId)
+    public static function deleteAdmin(string $adminId)
     {
         $admin = Admins::find($adminId);
 
@@ -127,29 +134,33 @@ class AdminAccountManagementService
         }
 
         // 店舗とのリレーションを削除
-        RelationshipManagementService::deleteRelationshipByAdmin($admin);
+        try {
+            RelationshipManagementService::deleteRelationship($admin);
+        } catch (\Exception $e) {
+            return false;
+        }
 
         // アカウントを削除、成功したらtrueを返す
-        return $admin->delete() == 1;
+        return $admin->delete();
     }
 
     /**
      * 管理者アカウント存在するか確認
-     * @param string 管理者アカウントID
+     * @param string|null $adminId 管理者アカウントID
+     * @param string|null $loginId ログインID
      * @return bool false:存在しない true:存在する
      */
-    public static function isExist($adminId)
+    public static function isExist(?string $adminId = null, ?string $loginId = null)
     {
-        return Admins::find($adminId) !== null;
-    }
-
-    /**
-     * ログインIDが存在するか確認
-     * @param string ログインID
-     * @return bool false:存在しない true:存在する
-     */
-    public static function isExistByLoginId($loginId)
-    {
-        return Admins::where('login_id', $loginId)->first() !== null;
+        $query = Admins::where('admin_id', $adminId);
+    
+        if ($adminId != null) {
+            $query->where('admin_id', $adminId);
+        }
+        if ($loginId !== null) {
+            $query->where('login_id', $loginId);
+        }
+    
+        return $query->exists();
     }
 }

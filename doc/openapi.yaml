@@ -119,7 +119,7 @@ paths:
             schema:
               type: object
               properties:
-                admin_owner_id:
+                owner_admin_id:
                   type: integer
                   description: オーナーの管理者ID
                 restaurant_name:
@@ -130,7 +130,7 @@ paths:
                 restaurant_image_url:
                   type: string
               required:
-                - admin_owner_id
+                - owner_admin_id
                 - restaurant_name
       parameters:
         - schema:
