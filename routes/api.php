@@ -231,6 +231,13 @@ Route::get('/management/seat/{seat_id}', [SeatManagementController::class, 'seat
  */
 Route::put('/management/seat/{seat_id}/refresh', [SeatManagementController::class, 'seatRefresh']);
 
+/**
+ * put multipleSeatAdd
+ * Summary: 新規店舗の座席一括登録
+ * Output-Formats: [application/json]
+ */
+Route::post('/management/seat/byRestaurant/{restaurant_id}/{seat_num}', [SeatManagementController::class, 'multipleSeatAdd']);
+
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });

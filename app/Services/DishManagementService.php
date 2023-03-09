@@ -14,11 +14,27 @@ class DishManagementService
      */
     public static function getDishList(?string $restaurantID = null)
     {
+        // 店舗IDが指定されていない場合は、全ての料理を取得
         if ($restaurantID === null) {
-            return Dishes::get();
+            $dishes = Dishes::all();
         } else {
-            return Dishes::where('restaurant_id', $restaurantID)->get();
+            $dishes = Dishes::where('restaurant_id', $restaurantID)->get();
         }
+
+        // カテゴリー別に料理を分類
+        $dishesByCategory = $dishes->groupBy('dish_category');
+        $dishesByCategory = $dishesByCategory->map(function ($categoryDishes, $category) {
+            return [
+                'category' => $category,
+                'dishes' => $categoryDishes->map(function ($dish) {
+                    unset($dish['dish_category']);
+                    return $dish;
+                }
+                ),
+            ];
+        })->values()->toArray();
+
+        return $dishesByCategory;
     }
 
     /**
@@ -78,7 +94,7 @@ class DishManagementService
         $dish->dish_description = $dishData['dish_description'] ?? $dish->dish_description;
         $dish->image_url = $dishData['image_url'] ?? $dish->image_url;
         $dish->available_num = $dishData['available_num'] ?? $dish->available_num;
-        
+
         return $dish->save();
     }
 

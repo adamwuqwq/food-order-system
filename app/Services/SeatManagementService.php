@@ -25,7 +25,7 @@ class SeatManagementService
     /**
      * 座席のQRコードトークンを更新する
      * @param string $seatId 座席ID
-     * @return bool 更新に成功したかどうか
+     * @return string QRコードトークン
      */
     public static function updateQrCodeToken(string $seatId)
     {
@@ -37,7 +37,9 @@ class SeatManagementService
         }
 
         $seat->qr_code_token = self::generateQrCodeToken();
-        return $seat->save();
+        $seat->save();
+
+        return $seat->qr_code_token;
     }
 
     /**
@@ -86,7 +88,7 @@ class SeatManagementService
      * @return Collection 追加された座席情報
      * @throws \Exception 既に座席が存在する
      */
-    public static function addSeats(string $restaurantId, int $seatNum)
+    public static function addMultipleSeats(string $restaurantId, int $seatNum)
     {
         // 既に座席が存在する場合は追加しない
         if (Seats::where('restaurant_id', $restaurantId)->exists()) {
@@ -149,5 +151,22 @@ class SeatManagementService
     public static function isExist(string $seatId)
     {
         return Seats::find($seatId) !== null;
+    }
+
+    /**
+     * 座席に対応した注文のIDを取得する
+     * @param string $seatId 座席ID
+     * @return string|null 注文ID
+     */
+    public static function getOrderId(string $seatId)
+    {
+        $seat = Seats::find($seatId);
+
+        // 座席が存在しない、または空席の場合はnullを返す
+        if ($seat === null || $seat->is_available) {
+            return null;
+        }
+
+        return $seat->orders->where('is_paid', false)->latest('created_at')->first()->seat_id ?? null;
     }
 }
