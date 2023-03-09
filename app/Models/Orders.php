@@ -18,9 +18,7 @@ class Orders extends Model
     protected $fillable = [
         'restaurant_id',
         'seat_id',
-        'is_all_delivered',
         'is_order_finished',
-        'total_price',
         'is_paid',
         'paid_at',
     ];
@@ -28,7 +26,6 @@ class Orders extends Model
     protected $attributes = [
         'is_all_delivered' => false,
         'is_order_finished' => false,
-        'total_price' => 0,
         'is_paid' => false,
         'paid_at' => null,
     ];

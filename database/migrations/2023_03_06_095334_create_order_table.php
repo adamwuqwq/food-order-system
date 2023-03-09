@@ -15,9 +15,7 @@ return new class extends Migration
             $table->bigIncrements('order_id');
             $table->bigInteger('restaurant_id')->unsigned();
             $table->bigInteger('seat_id')->unsigned();
-            $table->boolean('is_all_delivered')->default(false);
             $table->boolean('is_order_finished')->default(false);
-            $table->integer('total_price')->default(0);
             $table->boolean('is_paid')->default(false);
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
