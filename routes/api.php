@@ -151,11 +151,11 @@ Route::get('/management/order/byRestaurant/{restaurant_id}/unserved', [OrderMana
 Route::get('/management/order/{order_id}', [OrderManagementController::class, 'orderGet']);
 
 /**
- * put orderPut
+ * put orderComplete
  * Summary: (会計済みボタン) 注文を完了する
  * Notes: 注文状態(is_paid)、座席のQRコードトークンを更新する。
  */
-Route::put('/management/order/{order_id}/checkout', [OrderManagementController::class, 'orderPut']);
+Route::put('/management/order/{order_id}/checkout', [OrderManagementController::class, 'orderComplete']);
 
 /**
  * get restaurantList

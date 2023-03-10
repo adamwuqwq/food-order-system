@@ -169,4 +169,17 @@ class SeatManagementService
 
         return $seat->orders->where('is_paid', false)->latest('created_at')->first()->seat_id ?? null;
     }
+
+    /**
+     * 座席のQRコードトークンを利用して座席IDを取得する
+     * @param string $qrCodeToken QRコードトークン
+     * @return string|null 座席ID
+     */
+    public static function getSeatIdByQrCodeToken(string $qrCodeToken)
+    {
+        $seat = Seats::where('qr_code_token', $qrCodeToken)->first();
+
+        // 座席が存在しない場合はnullを返す
+        return $seat === null ? null : $seat->id;
+    }
 }

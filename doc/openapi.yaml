@@ -1434,6 +1434,7 @@ paths:
       security:
         - bearerAuth: []
 
+
   /customer/dish:
     get:
       tags:
@@ -1480,10 +1481,9 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
+
 
   /customer/dish/{dish_id}:
     get:
@@ -1523,7 +1523,7 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: qr_code_token
           description: 座席のQRコードに含まれているトークン
         - schema:
             type: integer
@@ -1531,8 +1531,7 @@ paths:
           required: true
           name: dish_id
           description: 料理のID
-      security:
-        - bearerAuth: []
+
 
   /customer/order:
     get:
@@ -1589,10 +1588,9 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
+
 
     post:
       tags:
@@ -1651,10 +1649,9 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
+
 
   /customer/order/finish:
     post:
@@ -1675,10 +1672,9 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
+
 
 components:
   securitySchemes:

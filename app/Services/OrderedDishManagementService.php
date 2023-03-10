@@ -161,4 +161,52 @@ class OrderedDishManagementService
         $orderedDish->is_delivered = true;
         $orderedDish->save();
     }
+
+    /**
+     * 未提供料理の一覧取得(by 店舗ID)
+     * @param string|null $restaurantID 店舗ID(指定されている場合は、その店舗の未提供料理取得)
+     * @return array 未提供料理の一覧
+     */
+    public static function getUnservedDishListByRestaurant(?string $restaurantID = null)
+    {
+        $orderedDishes = self::getOrderedDishListByRestaurant($restaurantID);
+
+        $unservedDishes = [];
+        foreach ($orderedDishes as $orderedDish) {
+            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
+                $unservedDishes[] = $orderedDish;
+            }
+        }
+
+        return $unservedDishes;
+    }
+
+    /**
+     * 未提供料理の一覧取得(by 注文ID)
+     * @param string $orderID 注文ID
+     * @return array|null 未提供料理の一覧
+     */
+    public static function getUnservedDishListByOrder(string $orderID)
+    {
+        $orderedDishes = OrderedDishManagementService::getOrderedDishListByOrder($orderID);
+
+        $unservedDishes = [];
+        foreach ($orderedDishes as $orderedDish) {
+            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
+                $unservedDishes[] = $orderedDish;
+            }
+        }
+
+        return $unservedDishes;
+    }
+
+    /**
+     * 注文済み料理の存在確認
+     * @param string $orderedDishID 注文済み料理ID
+     * @return bool 存在する場合はtrue
+     */
+    public static function isExist(string $orderedDishID)
+    {
+        return OrderedDishes::find($orderedDishID) !== null;
+    }
 }

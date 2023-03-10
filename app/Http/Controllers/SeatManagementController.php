@@ -5,12 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use \Illuminate\Validation\ValidationException;
-use App\Services\AdminAccountManagementService;
 use App\Services\RestaurantManagementService;
 use App\Services\SeatManagementService;
-use App\Services\MenuManagementService;
-use App\Services\DishManagementService;
-use App\Services\OrderManagementService;
+
 use App\Models\Seats;
 
 class SeatManagementController extends Controller

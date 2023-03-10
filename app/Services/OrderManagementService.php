@@ -25,7 +25,7 @@ class OrderManagementService
 
         // 注文の総額を計算、未提供料理があるかどうかを判定
         foreach ($orders as $order) {
-            $order['is_all_delivered'] = count(self::getUnservedDishListByOrder($order->id)) === 0;
+            $order['is_all_delivered'] = count(OrderedDishManagementService::getUnservedDishListByOrder($order->id)) === 0;
             $order['total_price'] = OrderedDishManagementService::getTotalPrice($order->id);
         }
 
@@ -55,7 +55,7 @@ class OrderManagementService
         $order['total_price'] = $totalPrice;
 
         // 未提供料理があるかどうかを判定
-        $unservedDishes = self::getUnservedDishListByOrder($orderID);
+        $unservedDishes = OrderedDishManagementService::getUnservedDishListByOrder($orderID);
         $order['is_all_delivered'] = count($unservedDishes) === 0;
 
         return $order;
@@ -91,44 +91,6 @@ class OrderManagementService
     }
 
     /**
-     * 未提供料理の一覧取得(by 店舗ID)
-     * @param string|null $restaurantID 店舗ID(指定されている場合は、その店舗の未提供料理取得)
-     * @return array 未提供料理の一覧
-     */
-    public static function getUnservedDishListByRestaurant(?string $restaurantID = null)
-    {
-        $orderedDishes = OrderedDishManagementService::getOrderedDishListByRestaurant($restaurantID);
-
-        $unservedDishes = [];
-        foreach ($orderedDishes as $orderedDish) {
-            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
-                $unservedDishes[] = $orderedDish;
-            }
-        }
-
-        return $unservedDishes;
-    }
-
-    /**
-     * 未提供料理の一覧取得(by 注文ID)
-     * @param string $orderID 注文ID
-     * @return array|null 未提供料理の一覧
-     */
-    public static function getUnservedDishListByOrder(string $orderID)
-    {
-        $orderedDishes = OrderedDishManagementService::getOrderedDishListByOrder($orderID);
-
-        $unservedDishes = [];
-        foreach ($orderedDishes as $orderedDish) {
-            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
-                $unservedDishes[] = $orderedDish;
-            }
-        }
-
-        return $unservedDishes;
-    }
-
-    /**
      * 注文を完了(支払い、退店)
      * @param string $orderID 注文ID
      * @return bool 注文の完了に成功したかどうか
@@ -143,7 +105,7 @@ class OrderManagementService
         }
 
         // 未提供料理が存在する場合はfalseを返す
-        $unservedDishes = self::getUnservedDishListByOrder($orderID);
+        $unservedDishes = OrderedDishManagementService::getUnservedDishListByOrder($orderID);
         if (count($unservedDishes) > 0) {
             return false;
         }
@@ -151,17 +113,8 @@ class OrderManagementService
         // 注文の状態を「支払い済み」に変更
         $order->is_paid = true;
         $order->is_order_finished = true;
-        $orderUpdateStatus = $order->save();
 
-        // 座席の状態を「空席」に変更
-        $seat = Seats::find($order->seat_id);
-        $seat->is_available = true;
-        $seatUpdateStatus = $seat->save();
-
-        // QRコードトークンの再発行
-        SeatManagementService::updateQrCodeToken($order->seat_id);
-
-        return $seatUpdateStatus && $orderUpdateStatus;
+        return $order->save();
     }
 
     /**
@@ -179,14 +132,24 @@ class OrderManagementService
         }
 
         // 未提供料理が存在する場合はfalseを返す
-        $unservedDishes = self::getUnservedDishListByOrder($orderID);
+        $unservedDishes = OrderedDishManagementService::getUnservedDishListByOrder($orderID);
         if (count($unservedDishes) > 0) {
             return false;
         }
 
         // 注文の状態を「会計依頼」に変更
         $order->is_order_finished = true;
-        
+
         return $order->save();
+    }
+
+    /**
+     * 注文が存在するかを判定
+     * @param string $orderID 注文ID
+     * @return bool 注文が存在するか
+     */
+    public static function isExist(string $orderID)
+    {
+        return Orders::find($orderID) !== null;
     }
 }

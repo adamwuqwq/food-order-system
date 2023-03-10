@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use \Illuminate\Validation\ValidationException;
+use App\Models\Seats;
+use App\Models\Orders;
 use App\Services\AdminAccountManagementService;
 use App\Services\RestaurantManagementService;
 use App\Services\MenuManagementService;
 use App\Services\DishManagementService;
+use App\Services\SeatManagementService;
 use App\Services\OrderManagementService;
+use App\Services\OrderedDishManagementService;
 
 class OrderManagementController extends Controller
 {
@@ -27,6 +31,21 @@ class OrderManagementController extends Controller
      */
     public function orderedDishCancel(string $orderedDishId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 注文した料理が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!OrderedDishManagementService::isExist($orderedDishId)) {
+            return response()->json(['error' => '指定した料理は存在しません'], 400);
+        }
+
+        // 注文した料理のキャンセル
+        try {
+            OrderedDishManagementService::cancelOrderedDish($orderedDishId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '注文した料理のキャンセルに失敗しました'], 500);
+        }
+
+        return response()->json(['message' => '注文した料理をキャンセルしました'], 200);
     }
 
     /**
@@ -36,6 +55,21 @@ class OrderManagementController extends Controller
      */
     public function orderedDishDelivery(string $orderedDishId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 注文した料理が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!OrderedDishManagementService::isExist($orderedDishId)) {
+            return response()->json(['error' => '指定した料理は存在しません'], 400);
+        }
+
+        // 注文した料理のステータスを提供済みにする
+        try {
+            OrderedDishManagementService::deliverOrderedDish($orderedDishId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '注文した料理のステータスの更新に失敗しました'], 500);
+        }
+
+        return response()->json(['message' => '注文した料理のステータスを提供済みにしました'], 200);
     }
 
     /**
@@ -45,6 +79,21 @@ class OrderManagementController extends Controller
      */
     public function orderList(string $restaurantId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 指定した店舗が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
+
+        // 注文一覧の取得
+        try {
+            $orderList = OrderManagementService::getOrderList($restaurantId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '注文一覧の取得に失敗しました'], 500);
+        }
+
+        return response()->json($orderList, 200);
     }
 
     /**
@@ -54,6 +103,21 @@ class OrderManagementController extends Controller
      */
     public function unservedDishList(string $restaurantId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 指定した店舗が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!RestaurantManagementService::isExist($restaurantId)) {
+            return response()->json(['error' => '指定した店舗は存在しません'], 400);
+        }
+
+        // 未提供料理一覧の取得
+        try {
+            $unservedDishList = OrderedDishManagementService::getUnservedDishListByRestaurant($restaurantId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '未提供料理一覧の取得に失敗しました'], 500);
+        }
+
+        return response()->json($unservedDishList, 200);
     }
 
     /**
@@ -63,6 +127,21 @@ class OrderManagementController extends Controller
      */
     public function orderGet(string $orderId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 指定した注文が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!OrderManagementService::isExist($orderId)) {
+            return response()->json(['error' => '指定した注文は存在しません'], 400);
+        }
+
+        // 注文詳細の取得
+        try {
+            $order = OrderManagementService::getOrderInfo($orderId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '注文詳細の取得に失敗しました'], 500);
+        }
+
+        return response()->json($order, 200);
     }
 
     /**
@@ -70,7 +149,32 @@ class OrderManagementController extends Controller
      * @param string $orderId 注文のID (required)
      * @return \Illuminate\Http\JSONResponse
      */
-    public function orderPut(string $orderId)
+    public function orderComplete(string $orderId)
     {
+        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
+
+        // 指定した注文が存在するか確認(存在しない場合は、400エラーを返す)
+        if (!OrderManagementService::isExist($orderId)) {
+            return response()->json(['error' => '指定した注文は存在しません'], 400);
+        }
+
+        // 注文を完了する
+        try {
+            // 注文のステータスを「完了」に変更
+            OrderManagementService::checkoutOrder($orderId);
+
+            // 座席の状態を「空席」に変更
+            $seatId = Orders::find($orderId)->seat_id;
+            $seat = Seats::find($seatId);
+            $seat->is_available = true;
+            $seat->save();
+
+            // QRコードトークンの再発行
+            SeatManagementService::updateQrCodeToken($seatId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => '注文の完了に失敗しました'], 500);
+        }
+
+        return response()->json(['message' => '注文を完了しました'], 200);
     }
 }
