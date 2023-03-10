@@ -26,6 +26,11 @@ class Seats extends Model
         'is_available' => true,
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function orders(): HasMany
     {
         return $this->hasMany(Orders::class, 'seat_id', 'seat_id');

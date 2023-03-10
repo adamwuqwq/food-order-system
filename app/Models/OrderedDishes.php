@@ -29,6 +29,11 @@ class OrderedDishes extends Model
         'is_canceled' => false,
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function orders(): BelongsTo
     {
         return $this->belongsTo(Orders::class, 'order_id', 'order_id');

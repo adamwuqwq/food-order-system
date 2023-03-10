@@ -25,8 +25,8 @@ class OrderManagementService
 
         // 注文の総額を計算、未提供料理があるかどうかを判定
         foreach ($orders as $order) {
-            $order['is_all_delivered'] = count(OrderedDishManagementService::getUnservedDishListByOrder($order->id)) === 0;
-            $order['total_price'] = OrderedDishManagementService::getTotalPrice($order->id);
+            $order['is_all_delivered'] = count(OrderedDishManagementService::getUnservedDishListByOrder($order->order_id)) === 0;
+            $order['total_price'] = OrderedDishManagementService::getTotalPrice($order->order_id);
         }
 
         return $orders;
@@ -87,32 +87,35 @@ class OrderManagementService
         $order->is_paid = false;
         $order->save();
 
-        return $order->id;
+        return $order->order_id;
     }
 
     /**
      * 注文を完了(支払い、退店)
      * @param string $orderID 注文ID
-     * @return bool 注文の完了に成功したかどうか
+     * @return \Exception
      */
     public static function checkOutOrder(string $orderID)
     {
         $order = Orders::find($orderID);
 
-        // 注文が存在しない場合はfalseを返す
+        // 注文が存在しない場合は例外を投げる
         if ($order === null) {
-            return false;
+            throw new \Exception('注文が存在しません');
         }
 
-        // 未提供料理が存在する場合はfalseを返す
+        // 未提供料理が存在する場合は強制的に完了させる
         $unservedDishes = OrderedDishManagementService::getUnservedDishListByOrder($orderID);
-        if (count($unservedDishes) > 0) {
-            return false;
+        foreach ($unservedDishes as $unservedDish) {
+            OrderedDishManagementService::deliverOrderedDish($unservedDish['ordered_dish_id']);
         }
 
         // 注文の状態を「支払い済み」に変更
         $order->is_paid = true;
         $order->is_order_finished = true;
+
+        // 支払い時間をtimestamp記録
+        $order->paid_at = now();
 
         return $order->save();
     }
@@ -120,7 +123,8 @@ class OrderManagementService
     /**
      * 注文確定、会計依頼
      * @param string $orderID 注文ID
-     * @return bool 注文確定、会計依頼に成功したかどうか
+     * @return void
+     * @throws \Exception
      */
     public static function finishOrder(string $orderID)
     {
@@ -131,10 +135,10 @@ class OrderManagementService
             return false;
         }
 
-        // 未提供料理が存在する場合はfalseを返す
+        // 未提供料理が存在する場合は例外を投げる
         $unservedDishes = OrderedDishManagementService::getUnservedDishListByOrder($orderID);
         if (count($unservedDishes) > 0) {
-            return false;
+            throw new \Exception('未提供料理が存在するため、注文を完了できません');
         }
 
         // 注文の状態を「会計依頼」に変更
@@ -151,5 +155,20 @@ class OrderManagementService
     public static function isExist(string $orderID)
     {
         return Orders::find($orderID) !== null;
+    }
+
+    /**
+     * 座席に対応した最新の未完了注文を取得
+     * @param string $seatID 座席ID
+     * @return string|null 最新の未完了注文のID
+     */
+    public static function getOrderBySeat(string $seatID)
+    {
+        $order = Orders::where('seat_id', $seatID)
+            ->where('is_paid', false)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $order === null ? null : $order->order_id;
     }
 }

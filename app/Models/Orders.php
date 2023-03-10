@@ -30,6 +30,11 @@ class Orders extends Model
         'paid_at' => null,
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function orderedDishes(): HasMany
     {
         return $this->hasMany(OrderedDishes::class, 'order_id', 'order_id');

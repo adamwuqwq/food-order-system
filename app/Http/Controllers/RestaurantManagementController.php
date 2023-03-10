@@ -37,7 +37,7 @@ class RestaurantManagementController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => '店舗の一覧取得に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($restaurants, 200);
@@ -70,7 +70,7 @@ class RestaurantManagementController extends Controller
         try {
             $restaurantId = RestaurantManagementService::createRestaurant($restaurantInfo);
         } catch (\Exception $e) {
-            return response()->json(['error' => '店舗の作成に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['restaurant_id' => $restaurantId], 200);
@@ -94,7 +94,7 @@ class RestaurantManagementController extends Controller
         try {
             RestaurantManagementService::deleteRestaurant($restaurantId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '店舗の削除に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '店舗を削除しました'], 200);
@@ -164,7 +164,7 @@ class RestaurantManagementController extends Controller
         try {
             RestaurantManagementService::editRestaurant($restaurantId, $restaurantInfo);
         } catch (\Exception $e) {
-            return response()->json(['error' => '店舗情報の編集に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '店舗情報を変更しました'], 200);

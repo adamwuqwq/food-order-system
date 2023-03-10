@@ -180,6 +180,6 @@ class SeatManagementService
         $seat = Seats::where('qr_code_token', $qrCodeToken)->first();
 
         // 座席が存在しない場合はnullを返す
-        return $seat === null ? null : $seat->id;
+        return $seat === null ? null : $seat->seat_id;
     }
 }

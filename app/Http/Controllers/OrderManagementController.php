@@ -7,10 +7,7 @@ use Illuminate\Http\Request;
 use \Illuminate\Validation\ValidationException;
 use App\Models\Seats;
 use App\Models\Orders;
-use App\Services\AdminAccountManagementService;
 use App\Services\RestaurantManagementService;
-use App\Services\MenuManagementService;
-use App\Services\DishManagementService;
 use App\Services\SeatManagementService;
 use App\Services\OrderManagementService;
 use App\Services\OrderedDishManagementService;
@@ -42,7 +39,7 @@ class OrderManagementController extends Controller
         try {
             OrderedDishManagementService::cancelOrderedDish($orderedDishId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '注文した料理のキャンセルに失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '注文した料理をキャンセルしました'], 200);
@@ -114,7 +111,7 @@ class OrderManagementController extends Controller
         try {
             $unservedDishList = OrderedDishManagementService::getUnservedDishListByRestaurant($restaurantId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '未提供料理一覧の取得に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($unservedDishList, 200);
@@ -138,7 +135,7 @@ class OrderManagementController extends Controller
         try {
             $order = OrderManagementService::getOrderInfo($orderId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '注文詳細の取得に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($order, 200);
@@ -172,7 +169,7 @@ class OrderManagementController extends Controller
             // QRコードトークンの再発行
             SeatManagementService::updateQrCodeToken($seatId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '注文の完了に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '注文を完了しました'], 200);

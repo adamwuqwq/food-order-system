@@ -72,7 +72,9 @@ class OrderedDishManagementService
         foreach ($orderedDishes as $dish) {
             // キャンセルされていない料理のみ計算
             if (!$dish->is_canceled) {
-                $totalPrice += ($dish->dish()->price * $dish->quantity);
+                $dishQuantity = $dish->quantity;
+                $dishPrice = Dishes::find($dish->dish_id)->dish_price;
+                $totalPrice += $dishPrice * $dishQuantity;
             }
         }
 
@@ -81,25 +83,26 @@ class OrderedDishManagementService
 
     /**
      * 料理の新規注文作成
-     * @param Orders $order 注文情報
+     * @param string $orderID 注文ID
      * @param string $dishID 料理ID
      * @param int $quantity 注文数
      * @return string 作成された注文済み料理のID
      * @throws \Exception 作成に失敗した
      */
-    public static function createOrderedDish(Orders $order, string $dishID, int $quantity)
+    public static function createOrderedDish(string $orderID, string $dishID, int $quantity)
     {
         // エラー処理
-        if (Dishes::find($dishID) === null) {
-            throw new \Exception('料理IDが不正です');
+        $order = Orders::find($orderID);
+        if (Dishes::find($dishID) === null || $order === null) {
+            throw new \Exception('料理IDまたは注文IDが不正です');
         }
-        if ($quantity <= 0 || $quantity > Dishes::find($dishID)->available_num) {
+        if ($quantity <= 0) {
             throw new \Exception('注文数量が不正です');
         }
 
         // 注文済み料理の新規作成
         $orderedDish = new OrderedDishes();
-        $orderedDish->order_id = $order->order_id;
+        $orderedDish->order_id = $orderID;
         $orderedDish->restaurant_id = $order->restaurant_id;
         $orderedDish->dish_id = $dishID;
         $orderedDish->quantity = $quantity;
@@ -108,7 +111,7 @@ class OrderedDishManagementService
 
         $orderedDish->save();
 
-        return $orderedDish->id;
+        return $orderedDish->ordered_dish_id;
     }
 
     /**

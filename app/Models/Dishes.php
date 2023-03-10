@@ -33,6 +33,11 @@ class Dishes extends Model
         'dish_description' => null,
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function restaurants(): BelongsTo
     {
         return $this->belongsTo(Restaurants::class, 'restaurant_id', 'restaurant_id');

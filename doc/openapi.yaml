@@ -905,7 +905,6 @@ paths:
       security:
         - bearerAuth: []
 
-
   /management/seat/byRestaurant/{restaurant_id}/{seat_num}:
     post:
       tags:
@@ -922,7 +921,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    seat_id: 
+                    seat_id:
                       type: integer
                       description: 追加された座席のID
                     qr_code_token:
@@ -1434,7 +1433,6 @@ paths:
       security:
         - bearerAuth: []
 
-
   /customer/dish:
     get:
       tags:
@@ -1484,7 +1482,6 @@ paths:
           name: qr_code_token
           description: 座席のQRコードに含まれているトークン
 
-
   /customer/dish/{dish_id}:
     get:
       tags:
@@ -1532,7 +1529,6 @@ paths:
           name: dish_id
           description: 料理のID
 
-
   /customer/order:
     get:
       tags:
@@ -1545,42 +1541,40 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    order_id:
-                      type: integer
-                      description: 注文ID
-                    ordered_dishes:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          ordered_dish_id:
-                            type: integer
-                            description: 注文した料理の注文ID
-                          ordered_dish_name:
-                            type: string
-                            description: 注文した料理の名称
-                          ordered_dish_price:
-                            type: integer
-                            description: 注文した料理の価格
-                          ordered_dish_num:
-                            type: integer
-                            description: 注文した料理の個数
-                          ordered_dish_status:
-                            type: string
-                            description: 注文した料理のステータス
-                    total_price:
-                      type: integer
-                      description: 合計金額
-                    is_paid:
-                      type: boolean
-                      description: 会計済みかどうか
-                    created_at:
-                      type: string
-                      description: 注文日時
+                type: object
+                properties:
+                  order_id:
+                    type: integer
+                    description: 注文ID
+                  ordered_dishes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ordered_dish_id:
+                          type: integer
+                          description: 注文した料理の注文ID
+                        ordered_dish_name:
+                          type: string
+                          description: 注文した料理の名称
+                        ordered_dish_price:
+                          type: integer
+                          description: 注文した料理の価格
+                        ordered_dish_num:
+                          type: integer
+                          description: 注文した料理の個数
+                        ordered_dish_status:
+                          type: string
+                          description: 注文した料理のステータス
+                  total_price:
+                    type: integer
+                    description: 合計金額
+                  is_paid:
+                    type: boolean
+                    description: 会計済みかどうか
+                  created_at:
+                    type: string
+                    description: 注文日時
         "401":
           description: Unauthorized (トークンが無効)
       parameters:
@@ -1590,7 +1584,6 @@ paths:
           required: true
           name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-
 
     post:
       tags:
@@ -1652,7 +1645,6 @@ paths:
           name: qr_code_token
           description: 座席のQRコードに含まれているトークン
 
-
   /customer/order/finish:
     post:
       tags:
@@ -1674,7 +1666,6 @@ paths:
           required: true
           name: qr_code_token
           description: 座席のQRコードに含まれているトークン
-
 
 components:
   securitySchemes:
