@@ -6,6 +6,7 @@ use App\Models\Admins;
 use App\Models\AdminRestaurantRelationships;
 use App\Services\RelationshipManagementService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Hash;
 
 class AdminAccountManagementService
 {
@@ -18,7 +19,7 @@ class AdminAccountManagementService
      */
     private static function hashPassword(string $password)
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        return Hash::make($password);
     }
 
     /**

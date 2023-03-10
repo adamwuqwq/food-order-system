@@ -16,15 +16,6 @@ class AccountManagementController extends Controller
     }
 
     /**
-     * 管理者(system, owner, counter, kitchen)ログイン.
-     * @return \Illuminate\Http\JSONResponse
-     */
-    public function adminLogin()
-    {
-        return response('How about implementing adminLogin as a post method ?');
-    }
-
-    /**
      * 管理者アカウントの一覧取得 (ownerは自分の店舗に所属しているアカウントのみ取得可能)
      * @return \Illuminate\Http\JSONResponse
      */

@@ -7,6 +7,7 @@ use App\Http\Controllers\RestaurantManagementController;
 use App\Http\Controllers\DishManagementController;
 use App\Http\Controllers\OrderManagementController;
 use App\Http\Controllers\SeatManagementController;
+use App\Http\Controllers\AuthorizationController;
 
 Route::group(['middleware' => ['customerAuthorization']], function () {
     // メニューの取得
@@ -24,6 +25,12 @@ Route::group(['middleware' => ['customerAuthorization']], function () {
     // 注文確定・会計依頼
     Route::post('/customer/order/finish', [CustomerController::class, 'customerOrderFinish']);
 });
+
+/**
+ * Summary: 管理者(system, owner, counter, kitchen)ログイン
+ * Output-Formats: [application/json]
+ */
+Route::post('/management/login', [AuthorizationController::class, 'adminLogin']);
 
 /**
  * Summary: 管理者アカウントの一覧取得 (ownerは自分の店舗に所属しているアカウントのみ取得可能)
@@ -80,12 +87,6 @@ Route::get('/management/dish/{dish_id}', [DishManagementController::class, 'dish
  * Summary: 料理情報編集
  */
 Route::put('/management/dish/{dish_id}', [DishManagementController::class, 'dishModify']);
-
-/**
- * Summary: 管理者(system, owner, counter, kitchen)ログイン
- * Output-Formats: [application/json]
- */
-Route::post('/management/login', [AccountManagementController::class, 'adminLogin']);
 
 /**
  * Summary: 注文した(+未提供)料理のキャンセル
