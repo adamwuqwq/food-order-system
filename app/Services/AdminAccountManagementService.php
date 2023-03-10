@@ -90,7 +90,8 @@ class AdminAccountManagementService
      * 管理者アカウントの情報更新
      * @param string $adminId 管理者アカウントID
      * @param array $adminData 管理者アカウント情報
-     * @return bool false:失敗 true:成功
+     * @return void
+     * @throws \Exception 更新に失敗した
      */
     public static function editAdmin(string $adminId, array $adminData)
     {
@@ -112,7 +113,7 @@ class AdminAccountManagementService
                 RelationshipManagementService::deleteRelationship($admin);
                 RelationshipManagementService::createRelationship($admin, $adminData['restaurant_id']);
             } catch (\Exception $e) {
-                return false;
+                throw new \Exception('店舗とのリレーションの更新に失敗しました');
             }
         }
 
@@ -122,7 +123,8 @@ class AdminAccountManagementService
     /**
      * 管理者アカウントの削除
      * @param string $adminId 管理者アカウントID
-     * @return bool false:失敗 true:成功
+     * @return void
+     * @throws \Exception 削除に失敗した
      */
     public static function deleteAdmin(string $adminId)
     {
@@ -130,14 +132,14 @@ class AdminAccountManagementService
 
         // もしadminIdに対応したアカウント存在しない場合は、falseを返す
         if ($admin === null) {
-            return false;
+            throw new \Exception('管理者アカウントが存在しません');
         }
 
         // 店舗とのリレーションを削除
         try {
             RelationshipManagementService::deleteRelationship($admin);
         } catch (\Exception $e) {
-            return false;
+            throw new \Exception('店舗とのリレーションの削除に失敗しました');
         }
 
         // アカウントを削除、成功したらtrueを返す

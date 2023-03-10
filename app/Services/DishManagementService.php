@@ -75,7 +75,8 @@ class DishManagementService
      * 料理の情報更新
      * @param string $dishID 料理ID
      * @param array $dishData 料理情報
-     * @return bool 更新に成功したか
+     * @return void
+     * @throws \Exception 更新に失敗した
      */
     public static function editDish(string $dishID, array $dishData)
     {
@@ -83,7 +84,7 @@ class DishManagementService
 
         // 存在しない料理の場合はfalseを返す
         if ($dish === null) {
-            return false;
+            throw new \Exception('存在しない料理です');
         }
 
         // 料理のデータを更新
@@ -101,7 +102,8 @@ class DishManagementService
     /**
      * 料理の削除
      * @param string $dishID 料理ID
-     * @return bool 削除に成功したか
+     * @return void
+     * @throws \Exception 削除に失敗した
      */
     public static function deleteDish(string $dishID)
     {
@@ -109,7 +111,7 @@ class DishManagementService
 
         // 存在しない料理の場合はfalseを返す
         if ($dish === null) {
-            return false;
+            throw new \Exception('存在しない料理です');
         }
 
         return $dish->delete();

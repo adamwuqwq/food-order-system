@@ -42,7 +42,7 @@ class AccountManagementController extends Controller
                 $admin['restaurant_name'] = array_column($restaurants, 'restaurant_name');
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => '管理者アカウントの一覧取得に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($admins, 200);
@@ -61,7 +61,7 @@ class AccountManagementController extends Controller
                 'admin_name' => 'required|string',
                 'login_id' => 'required|string|unique:admins,login_id',
                 'password' => 'required|string',
-                'admin_role' => 'required|string',
+                'admin_role' => 'required|string|in:system,owner,counter,kitchen',
                 'restaurant_id' => 'array',
                 'restaurant_id.*' => 'integer',
             ]);
@@ -77,7 +77,7 @@ class AccountManagementController extends Controller
         try {
             $adminId = AdminAccountManagementService::createAdmin($adminInfo);
         } catch (\Exception $e) {
-            return response()->json(['error' => '管理者アカウントの作成に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['admin_id' => $adminId], 200);
@@ -98,11 +98,13 @@ class AccountManagementController extends Controller
         // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
 
         // 管理者アカウントを削除 (削除に失敗した場合は、500エラーを返す)
-        if (AdminAccountManagementService::deleteAdmin($adminId)) {
-            return response()->json(['message' => '管理者アカウントを削除しました'], 200);
-        } else {
-            return response()->json(['error' => '管理者アカウントの削除に失敗しました'], 500);
+        try {
+            AdminAccountManagementService::deleteAdmin($adminId);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        return response()->json(['message' => '管理者アカウントを削除しました'], 200);
     }
 
     /**
@@ -163,10 +165,12 @@ class AccountManagementController extends Controller
         // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
 
         // 管理者アカウントを編集 (編集に失敗した場合は、500エラーを返す)
-        if (AdminAccountManagementService::editAdmin($adminId, $adminInfo)) {
-            return response()->json(['message' => '管理者アカウントを変更しました'], 200);
-        } else {
-            return response()->json(['error' => '管理者アカウントの編集に失敗しました'], 500);
+        try {
+            AdminAccountManagementService::editAdmin($adminId, $adminInfo);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        return response()->json(['message' => '管理者アカウントの情報を変更しました'], 200);
     }
 }

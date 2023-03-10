@@ -20,6 +20,9 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
         });
+
+        // TinyIntをBooleanに変換
+        DB::statement('ALTER TABLE seats MODIFY is_available BOOLEAN');
     }
 
     /**

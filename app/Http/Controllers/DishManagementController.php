@@ -51,7 +51,7 @@ class DishManagementController extends Controller
         try {
             $dishId = DishManagementService::createDish($dishInfo, $restaurantId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '料理の追加に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['dish_id' => $dishId], 200);
@@ -92,7 +92,7 @@ class DishManagementController extends Controller
         try {
             DishManagementService::deleteDish($dishId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '料理の削除に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '料理を削除しました'], 200);
@@ -144,7 +144,6 @@ class DishManagementController extends Controller
 
         // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
 
-
         // リクエストボディから料理情報を取得
         $dishInfo = json_decode($request->getContent(), true);
 
@@ -152,7 +151,7 @@ class DishManagementController extends Controller
         try {
             DishManagementService::editDish($dishId, $dishInfo);
         } catch (\Exception $e) {
-            return response()->json(['error' => '料理の編集に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '料理の情報を変更しました'], 200);

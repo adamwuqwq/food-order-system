@@ -23,6 +23,8 @@ class Admins extends Model
 
     protected $hidden = [
         'hashed_password',
+        'created_at',
+        'updated_at',
     ];
 
     public function adminRestaurantRelationships(): HasMany

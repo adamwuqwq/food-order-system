@@ -24,6 +24,10 @@ return new class extends Migration
             $table->foreign('dish_id')->references('dish_id')->on('dishes')->cascadeOnDelete();
             $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
         });
+
+        // TinyIntをBooleanに変換
+        DB::statement('ALTER TABLE ordered_dishes MODIFY is_delivered BOOLEAN');
+        DB::statement('ALTER TABLE ordered_dishes MODIFY is_canceled BOOLEAN');
     }
 
     /**

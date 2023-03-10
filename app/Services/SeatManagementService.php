@@ -8,11 +8,6 @@ use \Illuminate\Support\Str;
 
 class SeatManagementService
 {
-    //'restaurant_id',
-    //'seat_name',
-    //'qr_code_token',
-    //'is_available',
-
     /**
      * QRコードトークン(UUID)を生成する
      * @return string QRコードトークン
@@ -26,14 +21,15 @@ class SeatManagementService
      * 座席のQRコードトークンを更新する
      * @param string $seatId 座席ID
      * @return string QRコードトークン
+     * @throws \Exception 座席が存在しない
      */
     public static function updateQrCodeToken(string $seatId)
     {
         $seat = Seats::find($seatId);
 
-        // 座席が存在しない場合はnullを返す
+        // 座席が存在しない
         if ($seat === null) {
-            return false;
+            throw new \Exception('座席が存在しません');
         }
 
         $seat->qr_code_token = self::generateQrCodeToken();
@@ -108,15 +104,16 @@ class SeatManagementService
      * @param string $seatId 座席ID
      * @param string|null $seatName 座席名
      * @param bool|null $isAvailable 座席の利用可否
-     * @return bool 更新に成功したか
+     * @return void
+     * @throws \Exception 座席の更新に失敗した
      */
     public static function editSeat(string $seatId, ?string $seatName = null, ?bool $isAvailable = null)
     {
         $seat = Seats::find($seatId);
 
-        // 座席が存在しない場合はnullを返す
+        // 座席が存在しない場合
         if ($seat === null) {
-            return null;
+            throw new \Exception('座席が存在しません');
         }
 
         // 座席の情報を更新する
@@ -129,15 +126,16 @@ class SeatManagementService
     /**
      * 座席を削除する
      * @param string $seatId 座席ID
-     * @return bool 削除に成功したかどうか
+     * @return void
+     * @throws \Exception 座席の削除に失敗した
      */
     public static function deleteSeat(string $seatId)
     {
         $seat = Seats::find($seatId);
 
-        // 座席が存在しない場合はfalseを返す
+        // 座席が存在しない場合
         if ($seat === null) {
-            return false;
+            throw new \Exception('座席が存在しません');
         }
 
         return $seat->delete();

@@ -36,7 +36,7 @@ class RelationshipManagementService
      * 店舗と管理者のリレーション削除
      * @param Admins|null $admin 管理者アカウント
      * @param Restaurants|null $restaurant 店舗
-     * @throws Exception
+     * @throws \Exception
      */
     public static function deleteRelationship(?Admins $admin = null, ?Restaurants $restaurant = null)
     {
@@ -54,7 +54,7 @@ class RelationshipManagementService
         }
 
         if ($query->delete() === 0) {
-            throw new Exception('リレーションの削除に失敗しました');
+            throw new \Exception('リレーションの削除に失敗しました');
         }
     }
 }

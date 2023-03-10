@@ -25,6 +25,11 @@ class Restaurants extends Model
         'restaurant_image_url' => null,
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function orderedDishes(): HasMany
     {
         return $this->hasMany(OrderedDishes::class, 'restaurant_id', 'restaurant_id');

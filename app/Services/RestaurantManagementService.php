@@ -97,7 +97,8 @@ class RestaurantManagementService
      * 店舗情報の編集
      * @param string $restaurantId 店舗ID
      * @param array $restaurantData 店舗情報
-     * @return bool false:失敗 true:成功
+     * @return void
+     * @throws \Exception 編集に失敗した
      */
     public static function editRestaurant(string $restaurantId, array $restaurantData)
     {
@@ -112,28 +113,24 @@ class RestaurantManagementService
 
         // オーナーと店舗のリレイションを更新
         if (array_key_exists('owner_admin_id', $restaurantData)) {
-            try {
-                $newOwner = Admins::find($restaurantData['owner_admin_id']);
-                $oldOwner = self::getOwner($restaurantId);
+            $newOwner = Admins::find($restaurantData['owner_admin_id']);
+            $oldOwner = self::getOwner($restaurantId);
 
-                // 例外を投げる
-                if ($newOwner == null) {
-                    throw new \Exception('存在しないユーザーが指定されました');
-                }
-                if ($newOwner->admin_role !== 'owner') {
-                    throw new \Exception('オーナー権限がないユーザーが指定されました');
-                }
-
-                // 元のオーナーの権限を削除
-                if ($oldOwner != null) {
-                    RelationshipManagementService::deleteRelationship($oldOwner, $restaurant);
-                }
-
-                // 新しいオーナーの権限を追加
-                RelationshipManagementService::createRelationship($newOwner, array($restaurant->restaurant_id));
-            } catch (\Exception $e) {
-                return false;
+            // 例外を投げる
+            if ($newOwner == null) {
+                throw new \Exception('存在しないユーザーが指定されました');
             }
+            if ($newOwner->admin_role !== 'owner') {
+                throw new \Exception('オーナー権限がないユーザーが指定されました');
+            }
+
+            // 元のオーナーの権限を削除
+            if ($oldOwner != null) {
+                RelationshipManagementService::deleteRelationship($oldOwner, $restaurant);
+            }
+
+            // 新しいオーナーの権限を追加
+            RelationshipManagementService::createRelationship($newOwner, array($restaurant->restaurant_id));
         }
         return $isSaved;
     }
@@ -141,7 +138,8 @@ class RestaurantManagementService
     /**
      * 店舗の削除
      * @param string $restaurantId 店舗ID
-     * @return bool false:失敗 true:成功
+     * @return void
+     * @throws \Exception 削除に失敗した
      */
     public static function deleteRestaurant(string $restaurantId)
     {
@@ -165,8 +163,7 @@ class RestaurantManagementService
         // 注文料理のデータを削除
         OrderedDishes::where('restaurant_id', $restaurantId)->delete();
 
-        // 店舗のデータを削除
-        return $restaurant->delete();
+        $restaurant->delete();
     }
 
     /**

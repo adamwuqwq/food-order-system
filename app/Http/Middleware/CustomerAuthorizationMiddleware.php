@@ -12,7 +12,7 @@ class CustomerAuthorizationMiddleware
     public function handle(Request $request, Closure $next)
     {
         // へッダーからQRコードトークンを取得
-        $qrCodeToken = $request->header('qr_code_token');
+        $qrCodeToken = $request->header('Seat-Token');
         
         // QRコードトークンが存在するか確認
         $seat = Seats::where('qr_code_token', $qrCodeToken)->first();

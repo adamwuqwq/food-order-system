@@ -36,14 +36,15 @@ class OrderManagementService
      * 注文の詳細情報取得
      * @param string $orderID 注文ID
      * @return array 注文の詳細情報(ordered_dishes, total_priceを含む)
+     * @throws \Exception 注文が存在しない場合
      */
     public static function getOrderInfo(string $orderID)
     {
         $order = Orders::find($orderID);
 
-        // 注文が存在しない場合はnullを返す
+        // 注文が存在しない場合は例外を投げる
         if ($order === null) {
-            return null;
+            throw new \Exception('注文が存在しません');
         }
 
         // 注文済み料理の一覧を取得
@@ -130,9 +131,9 @@ class OrderManagementService
     {
         $order = Orders::find($orderID);
 
-        // 注文が存在しない場合はnullを返す
+        // 注文が存在しない場合は例外を投げる
         if ($order === null) {
-            return false;
+            throw new \Exception('注文が存在しません');
         }
 
         // 未提供料理が存在する場合は例外を投げる

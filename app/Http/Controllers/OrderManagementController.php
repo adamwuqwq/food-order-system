@@ -84,11 +84,7 @@ class OrderManagementController extends Controller
         }
 
         // 注文一覧の取得
-        try {
-            $orderList = OrderManagementService::getOrderList($restaurantId);
-        } catch (\Exception $e) {
-            return response()->json(['error' => '注文一覧の取得に失敗しました'], 500);
-        }
+        $orderList = OrderManagementService::getOrderList($restaurantId);
 
         return response()->json($orderList, 200);
     }
@@ -132,11 +128,7 @@ class OrderManagementController extends Controller
         }
 
         // 注文詳細の取得
-        try {
-            $order = OrderManagementService::getOrderInfo($orderId);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        $order = OrderManagementService::getOrderInfo($orderId);
 
         return response()->json($order, 200);
     }

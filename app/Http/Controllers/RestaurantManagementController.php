@@ -24,20 +24,15 @@ class RestaurantManagementController extends Controller
     {
         // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
 
-        // 店舗の一覧を取得 (取得に失敗した場合は、500エラーを返す)
-        try {
-            $restaurants = RestaurantManagementService::getRestaurantList();
-            // 店舗毎のowner_admin_idを取得し、レスポンスに追加
-            foreach ($restaurants as $restaurant) {
-                $owner = RestaurantManagementService::getOwner($restaurant->restaurant_id);
-                if ($owner !== null) {
-                    $restaurant['owner_admin_id'] = $owner->admin_id;
-                } else {
-                    $restaurant['owner_admin_id'] = null;
-                }
+        $restaurants = RestaurantManagementService::getRestaurantList();
+        // 店舗毎のowner_admin_idを取得し、レスポンスに追加
+        foreach ($restaurants as $restaurant) {
+            $owner = RestaurantManagementService::getOwner($restaurant->restaurant_id);
+            if ($owner !== null) {
+                $restaurant['owner_admin_id'] = $owner->admin_id;
+            } else {
+                $restaurant['owner_admin_id'] = null;
             }
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($restaurants, 200);
@@ -53,7 +48,7 @@ class RestaurantManagementController extends Controller
         // リクエストボディのバリデーション (400エラーを返す)
         try {
             $request->validate([
-                'restaurant_name' => 'required|string',
+                'restaurant_name' => 'required|string|unique:restaurants,restaurant_name',
                 'owner_admin_id' => 'integer',
                 'restaurant_address' => 'string',
                 'restaurant_image_url' => 'string',

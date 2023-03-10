@@ -20,6 +20,11 @@ class AdminRestaurantRelationships extends Model
         'admin_role',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function admins(): BelongsTo
     {
         return $this->belongsTo(Admins::class, 'admin_id', 'admin_id');

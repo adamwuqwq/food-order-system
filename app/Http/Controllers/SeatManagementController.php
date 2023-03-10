@@ -49,11 +49,7 @@ class SeatManagementController extends Controller
         }
 
         // 座席の追加
-        try {
-            $seatInfo = SeatManagementService::addSeat($restaurantId, $seatName);
-        } catch (\Exception $e) {
-            return response()->json(['error' => '座席の追加に失敗しました'], 500);
-        }
+        $seatInfo = SeatManagementService::addSeat($restaurantId, $seatName);
 
         $jsonResponse = [
             'seat_id' => $seatInfo->id,
@@ -75,13 +71,7 @@ class SeatManagementController extends Controller
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
         }
 
-        try {
-            // 座席情報一覧を取得(取得できなかった場合は、500エラーを返す)try {
-            $seatList = SeatManagementService::getSeatList($restaurantId);
-        } catch (\Exception $e) {
-            return response()->json(['error' => '座席一覧の取得に失敗しました'], 500);
-        }
-
+        $seatList = SeatManagementService::getSeatList($restaurantId);
         return response()->json($seatList, 200);
     }
 
@@ -101,7 +91,7 @@ class SeatManagementController extends Controller
         try {
             SeatManagementService::deleteSeat($seatId);
         } catch (\Exception $e) {
-            return response()->json(['error' => '座席の削除に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '座席を削除しました'], 200);
@@ -134,7 +124,7 @@ class SeatManagementController extends Controller
         try {
             SeatManagementService::editSeat($seatId, $request->input('seat_name'), $request->input('is_available'));
         } catch (\Exception $e) {
-            return response()->json(['error' => '座席の編集に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => '座席情報を更新しました'], 200);
@@ -162,7 +152,7 @@ class SeatManagementController extends Controller
                 $seatInfo['order_id'] = $orderID;
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => '座席情報の取得に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json($seatInfo, 200);
@@ -184,7 +174,7 @@ class SeatManagementController extends Controller
         try {
             $qrCodeToken = SeatManagementService::updateQrCodeToken($seatId);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'QRコードトークンの再発行に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['qr_code_token' => $qrCodeToken], 200);
@@ -212,12 +202,12 @@ class SeatManagementController extends Controller
         try {
             SeatManagementService::addMultipleSeats($restaurantId, $seat_num);
         } catch (\Exception $e) {
-            return response()->json(['error' => '座席の一括登録に失敗しました'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         // 座席のseat_idとseat_tokenを取得
         $seats = SeatManagementService::getSeatList($restaurantId);
-        $seats = $seats->map(function($seat) {
+        $seats = $seats->map(function ($seat) {
             return [
                 'seat_id' => $seat->seat_id,
                 'qr_code_token' => $seat->qr_code_token,

@@ -47,12 +47,7 @@ class CustomerController extends Controller
         }
 
         // 料理の詳細を取得
-        try {
-            $dish = DishManagementService::getDishInfo($dishId);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-
+        $dish = DishManagementService::getDishInfo($dishId);
         return response()->json($dish, 200);
     }
 

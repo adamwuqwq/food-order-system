@@ -828,7 +828,7 @@ paths:
                         order_id:
                           type: integer
                           description: 座席の注文ID
-                        qr_code_token:
+                        Seat-Token:
                           type: string
                           description: 座席のQRコードのトークン
         "400":
@@ -869,7 +869,7 @@ paths:
                   seat_id:
                     type: integer
                     description: 追加された座席のID
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 追加された座席のQRコードのトークン
         "400":
@@ -924,7 +924,7 @@ paths:
                     seat_id:
                       type: integer
                       description: 追加された座席のID
-                    qr_code_token:
+                    Seat-Token:
                       type: string
                       description: 追加された座席のQRコードのトークン
         "400":
@@ -981,7 +981,7 @@ paths:
                   order_id:
                     type: integer
                     description: 座席の注文ID
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 座席のQRコードのトークン
         "400":
@@ -1020,7 +1020,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 編集された座席のQRコードのトークン
         "400":
@@ -1101,7 +1101,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 再発行された座席のQRコードのトークン
         "400":
@@ -1479,7 +1479,7 @@ paths:
             type: string
           in: header
           required: true
-          name: qr_code_token
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
 
   /customer/dish/{dish_id}:
@@ -1520,7 +1520,7 @@ paths:
             type: string
           in: header
           required: true
-          name: qr_code_token
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
         - schema:
             type: integer
@@ -1582,7 +1582,7 @@ paths:
             type: string
           in: header
           required: true
-          name: qr_code_token
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
 
     post:
@@ -1642,7 +1642,7 @@ paths:
             type: string
           in: header
           required: true
-          name: qr_code_token
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
 
   /customer/order/finish:
@@ -1664,7 +1664,7 @@ paths:
             type: string
           in: header
           required: true
-          name: qr_code_token
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
 
 components:
