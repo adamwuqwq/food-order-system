@@ -24,7 +24,6 @@ class Orders extends Model
     ];
 
     protected $attributes = [
-        'is_all_delivered' => false,
         'is_order_finished' => false,
         'is_paid' => false,
         'paid_at' => null,

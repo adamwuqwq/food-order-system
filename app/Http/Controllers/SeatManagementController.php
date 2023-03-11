@@ -52,7 +52,7 @@ class SeatManagementController extends Controller
         $seatInfo = SeatManagementService::addSeat($restaurantId, $seatName);
 
         $jsonResponse = [
-            'seat_id' => $seatInfo->id,
+            'seat_id' => $seatInfo->seat_id,
             'qr_code_token' => $seatInfo->qr_code_token,
         ];
 

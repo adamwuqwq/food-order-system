@@ -154,7 +154,8 @@ class SeatManagementService
     /**
      * 座席に対応した注文のIDを取得する
      * @param string $seatId 座席ID
-     * @return string|null 注文ID
+     * @return string|null 注文のID
+     * @throws \Exception 注文のIDが取得できなかった
      */
     public static function getOrderId(string $seatId)
     {
@@ -165,7 +166,7 @@ class SeatManagementService
             return null;
         }
 
-        return $seat->orders->where('is_paid', false)->latest('created_at')->first()->seat_id ?? null;
+        return $seat->orders()->where('is_paid', false)->orderBy('created_at', 'desc')->first()->seat_id;
     }
 
     /**

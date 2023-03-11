@@ -30,7 +30,7 @@ class OrderedDishes extends Model
     ];
 
     protected $hidden = [
-        'created_at',
+        'is_canceled',
         'updated_at',
     ];
 

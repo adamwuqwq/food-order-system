@@ -128,7 +128,7 @@ class CustomerController extends Controller
                 $dish = Dishes::find($dishID);
                 $updatedAvailableNum = $dish->available_num - $ordered_dish['quantity'];
                 if ($updatedAvailableNum < 0) {
-                    return response()->json(['error' => '在庫が不足しています'], 400);
+                    return response()->json(['error' => $dish->dish_name . 'の在庫が不足しています'], 400);
                 }
                 DishManagementService::editDish($dishID, ['available_num' => $updatedAvailableNum]);
 

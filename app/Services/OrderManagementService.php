@@ -20,7 +20,7 @@ class OrderManagementService
         if ($restaurantID === null) {
             $orders = Orders::get();
         } else {
-            $orders = Orders::where('restaurant_id', $restaurantID)->get();
+            $orders = Orders::where('restaurant_id', $restaurantID)->orderBy('created_at', 'desc')->get();
         }
 
         // 注文の総額を計算、未提供料理があるかどうかを判定
@@ -65,15 +65,16 @@ class OrderManagementService
     /**
      * 注文の新規作成(来店)
      * @param string $seatID 座席ID
-     * @return string|null 注文ID
+     * @return string 注文ID
+     * @throws \Exception 座席が存在しないまたは使用中の場合
      */
     public static function createOrder(string $seatID)
     {
         $seat = Seats::find($seatID);
 
-        // 座席が存在しないまたは座席の状態が「空席」でない場合はnullを返す
+        // 座席が存在しないまたは座席の状態が「空席」でない場合
         if ($seat === null || !$seat->is_available) {
-            return null;
+            throw new \Exception('座席が存在しないか、使用中です');
         }
 
         // 座席の状態を「使用中」に変更

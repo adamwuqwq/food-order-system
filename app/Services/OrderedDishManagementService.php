@@ -16,7 +16,8 @@ class OrderedDishManagementService
      */
     public static function getOrderedDishListByOrder(string $orderID, ?bool $isCanceled = false)
     {
-        $orderedDishes = OrderedDishes::where('order_id', $orderID)->get();
+        // 注文時間の降順で注文済み料理を取得
+        $orderedDishes = OrderedDishes::where('order_id', $orderID)->orderBy('created_at', 'desc')->get();
 
         // キャンセル済みの料理を除外
         if (!$isCanceled) {
@@ -41,7 +42,8 @@ class OrderedDishManagementService
      */
     public static function getOrderedDishListByRestaurant(string $restaurantID, ?bool $isCanceled = false)
     {
-        $orderedDishes = OrderedDishes::where('restaurant_id', $restaurantID)->get();
+        // 注文時間の降順で注文済み料理を取得
+        $orderedDishes = OrderedDishes::where('restaurant_id', $restaurantID)->orderBy('created_at', 'desc')->get();
 
         // キャンセル済みの料理を除外
         if (!$isCanceled) {

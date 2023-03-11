@@ -144,11 +144,13 @@ class RestaurantManagementService
     public static function deleteRestaurant(string $restaurantId)
     {
         $restaurant = Restaurants::find($restaurantId);
-        $owner = self::getOwner($restaurantId);
+        $admins = AdminRestaurantRelationships::where('restaurant_id', $restaurantId)->get();
 
-        // オーナーと店舗のリレイションを削除
-        if ($owner != null) {
-            RelationshipManagementService::deleteRelationship($owner, $restaurant);
+        // 管理者と店舗のリレイションを削除
+        if ($admins != null) {
+            foreach ($admins as $admin) {
+                RelationshipManagementService::deleteRelationship(Admins::find($admin['admin_id']), $restaurant);
+            }
         }
 
         // 料理のデータを削除
