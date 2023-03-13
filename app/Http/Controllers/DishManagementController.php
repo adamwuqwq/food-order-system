@@ -29,18 +29,14 @@ class DishManagementController extends Controller
         }
 
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'dish_name' => 'required|string',
-                'dish_category' => 'string',
-                'dish_price' => 'required|integer',
-                'available_num' => 'required|integer',
-                'image_url' => 'string',
-                'dish_description' => 'string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'dish_name' => 'required|string',
+            'dish_category' => 'string',
+            'dish_price' => 'required|integer',
+            'available_num' => 'required|integer',
+            'image_url' => 'string',
+            'dish_description' => 'string',
+        ]);
 
         // リクエストボディから料理情報を取得
         $dishInfo = json_decode($request->getContent(), true);
@@ -54,7 +50,7 @@ class DishManagementController extends Controller
 
         return response()->json(['dish_id' => $dishId], 200);
     }
-    
+
     /**
      * 料理メニューの一覧取得
      * @param string $restaurantId メニューの一覧を取得したい店舗のID (required)
@@ -121,18 +117,14 @@ class DishManagementController extends Controller
         }
 
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'dish_name' => 'string',
-                'dish_category' => 'string',
-                'dish_price' => 'integer',
-                'available_num' => 'integer',
-                'image_url' => 'string',
-                'dish_description' => 'string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'dish_name' => 'string',
+            'dish_category' => 'string',
+            'dish_price' => 'integer',
+            'available_num' => 'integer',
+            'image_url' => 'string',
+            'dish_description' => 'string',
+        ]);
 
         // リクエストボディから料理情報を取得
         $dishInfo = json_decode($request->getContent(), true);

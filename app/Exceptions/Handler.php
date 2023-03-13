@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -54,6 +55,10 @@ class Handler extends ExceptionHandler
     {
         if ($e instanceof AuthenticationException) {
             return response()->json(['error' => '認証に失敗しました'], 401);
+        }
+
+        if ($e instanceof ValidationException) {
+            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
         }
 
         return parent::render($request, $e);

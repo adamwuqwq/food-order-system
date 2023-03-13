@@ -16,14 +16,10 @@ class AuthorizationController extends Controller
     public function adminLogin(Request $request)
     {
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'login_id' => 'required|string',
-                'password' => 'required|string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'login_id' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
         // ログインIDとパスワードが一致する管理者が存在するか確認
         $admin = Admins::where('login_id', $request->login_id)->first();

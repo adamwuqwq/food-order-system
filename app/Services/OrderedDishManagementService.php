@@ -14,13 +14,13 @@ class OrderedDishManagementService
      * @param bool $isCanceled キャンセル済みの料理も取得するかどうか
      * @return array 注文済み料理一覧
      */
-    public static function getOrderedDishListByOrder(string $orderID, ?bool $isCanceled = false)
+    public static function getOrderedDishListByOrder(string $orderID, ?bool $includeCanceled = false)
     {
         // 注文時間の降順で注文済み料理を取得
         $orderedDishes = OrderedDishes::where('order_id', $orderID)->orderBy('created_at', 'desc')->get();
 
         // キャンセル済みの料理を除外
-        if (!$isCanceled) {
+        if (!$includeCanceled) {
             $orderedDishes = $orderedDishes->filter(function ($dish) {
                 return !$dish->is_canceled;
             });

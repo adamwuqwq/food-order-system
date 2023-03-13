@@ -45,18 +45,14 @@ class AccountManagementController extends Controller
     public function adminSignUp(Request $request)
     {
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'admin_name' => 'required|string',
-                'login_id' => 'required|string|unique:admins,login_id',
-                'password' => 'required|string',
-                'admin_role' => 'required|string|in:system,owner,counter,kitchen',
-                'restaurant_id' => 'array',
-                'restaurant_id.*' => 'integer',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'admin_name' => 'required|string',
+            'login_id' => 'required|string|unique:admin,login_id',
+            'password' => 'required|string',
+            'admin_role' => 'required|string|in:system,owner,counter,kitchen',
+            'restaurant_id' => 'array',
+            'restaurant_id.*' => 'integer',
+        ]);
 
         $adminInfo = json_decode($request->getContent(), true);
 
@@ -106,16 +102,16 @@ class AccountManagementController extends Controller
 
         // 管理者アカウントを取得 (取得に失敗した場合は、500エラーを返す)
         $admin = AdminAccountManagementService::getAdminInfo($adminId);
-        if ($admin) {
-            // アカウント毎のrestaurant_idとrestaurant_nameを取得し、レスポンスに追加
-            $restaurants = AdminAccountManagementService::getRelatedRestaurant($admin->admin_id);
-            $admin['restaurant_id'] = array_column($restaurants, 'restaurant_id');
-            $admin['restaurant_name'] = array_column($restaurants, 'restaurant_name');
-
-            return response()->json($admin, 200);
-        } else {
+        if (!$admin) {
             return response()->json(['error' => '管理者アカウントの取得に失敗しました'], 500);
         }
+
+        // アカウント毎のrestaurant_idとrestaurant_nameを取得し、レスポンスに追加
+        $restaurants = AdminAccountManagementService::getRelatedRestaurant($admin->admin_id);
+        $admin['restaurant_id'] = array_column($restaurants, 'restaurant_id');
+        $admin['restaurant_name'] = array_column($restaurants, 'restaurant_name');
+
+        return response()->json($admin, 200);
     }
 
     /**
@@ -126,17 +122,13 @@ class AccountManagementController extends Controller
     public function adminModify(Request $request, string $adminId)
     {
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'admin_name' => 'string',
-                'login_id' => 'string|unique:admins,login_id',
-                'password' => 'string',
-                'restaurant_id' => 'array',
-                'restaurant_id.*' => 'integer',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'admin_name' => 'string',
+            'login_id' => 'string|unique:admin,login_id',
+            'password' => 'string',
+            'restaurant_id' => 'array',
+            'restaurant_id.*' => 'integer',
+        ]);
 
         $adminInfo = json_decode($request->getContent(), true);
 

@@ -16,7 +16,7 @@ class RelationshipManagementService
      */
     public static function createRelationship(Admins $admin, array $restaurantId)
     {
-        if (($admin->admin_role === 'kitchen' || $admin->admin_rold === 'counter') && count($restaurantId) > 1) {
+        if (($admin->admin_role === 'kitchen' || $admin->admin_role === 'counter') && count($restaurantId) > 1) {
             throw new Exception('キッチンとカウンターアカウントは、一つの店舗にしか所属できません');
         }
 

@@ -84,16 +84,12 @@ class CustomerController extends Controller
     public function customerOrderPost(Request $request)
     {
         // リクエストボディのバリデーション
-        try {
-            $this->validate($request, [
-                'seat_id' => 'required|integer',
-                'ordered_dishes' => 'required|array',
-                'ordered_dishes.*.dish_id' => 'required|integer',
-                'ordered_dishes.*.quantity' => 'required|integer|min:1',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'リクエストボディの形式が不正です'], 400);
-        }
+        $this->validate($request, [
+            'seat_id' => 'required|integer',
+            'ordered_dishes' => 'required|array',
+            'ordered_dishes.*.dish_id' => 'required|integer',
+            'ordered_dishes.*.quantity' => 'required|integer|min:1',
+        ]);
 
         // 座席を取得
         $seatID = $request->seat_id;

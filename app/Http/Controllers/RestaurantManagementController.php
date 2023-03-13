@@ -26,11 +26,7 @@ class RestaurantManagementController extends Controller
         // 店舗毎のowner_admin_idを取得し、レスポンスに追加
         foreach ($restaurants as $restaurant) {
             $owner = RestaurantManagementService::getOwner($restaurant->restaurant_id);
-            if ($owner !== null) {
-                $restaurant['owner_admin_id'] = $owner->admin_id;
-            } else {
-                $restaurant['owner_admin_id'] = null;
-            }
+            $restaurant['owner_admin_id'] = $owner?->admin_id;
         }
 
         return response()->json($restaurants, 200);
@@ -44,16 +40,12 @@ class RestaurantManagementController extends Controller
     public function restaurantSignUp(Request $request)
     {
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'restaurant_name' => 'required|string|unique:restaurants,restaurant_name',
-                'owner_admin_id' => 'integer',
-                'restaurant_address' => 'string',
-                'restaurant_image_url' => 'string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'restaurant_name' => 'required|string|unique:restaurant,restaurant_name',
+            'owner_admin_id' => 'integer',
+            'restaurant_address' => 'string',
+            'restaurant_image_url' => 'string',
+        ]);
 
         $restaurantInfo = json_decode($request->getContent(), true);
 
@@ -127,16 +119,12 @@ class RestaurantManagementController extends Controller
     public function restaurantModify(Request $request, string $restaurantId)
     {
         // リクエストボディのバリデーション (400エラーを返す)
-        try {
-            $request->validate([
-                'restaurant_name' => 'string',
-                'owner_admin_id' => 'integer',
-                'restaurant_address' => 'string',
-                'restaurant_image_url' => 'string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $request->validate([
+            'restaurant_name' => 'string',
+            'owner_admin_id' => 'integer',
+            'restaurant_address' => 'string',
+            'restaurant_image_url' => 'string',
+        ]);
 
         $restaurantInfo = json_decode($request->getContent(), true);
 

@@ -28,13 +28,9 @@ class SeatManagementController extends Controller
     public function seatAdd(Request $request, string $restaurantId)
     {
         // リクエストボディのバリデーション
-        try {
-            $this->validate($request, [
-                'seat_name' => 'required|string',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $this->validate($request, [
+            'seat_name' => 'required|string',
+        ]);
 
         // 指定した店舗が存在するか確認(存在しない場合は、400エラーを返す)
         if (!RestaurantManagementService::isExist($restaurantId)) {
@@ -106,14 +102,10 @@ class SeatManagementController extends Controller
     public function seatEdit(Request $request, string $seatId)
     {
         // リクエストボディのバリデーション
-        try {
-            $this->validate($request, [
-                'seat_name' => 'string',
-                'is_available' => 'boolean',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
-        }
+        $this->validate($request, [
+            'seat_name' => 'string',
+            'is_available' => 'boolean',
+        ]);
 
         // 指定した座席が存在するか確認(存在しない場合は、400エラーを返す)
         if (!SeatManagementService::isExist($seatId)) {
