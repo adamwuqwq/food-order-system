@@ -27,13 +27,13 @@ class AuthorizationController extends Controller
 
         // ログインIDとパスワードが一致する管理者が存在するか確認
         $admin = Admins::where('login_id', $request->login_id)->first();
-        
+
         if (!$admin || !Hash::check($request->password, $admin->hashed_password)) {
             return response()->json(['error' => 'ユーザーネームまたはパスワードが無効です'], 401);
         }
 
         // トークンを発行
-        $token = $admin->createToken('auth_token')->plainTextToken;
+        $token = $admin->createToken('auth_token', ['expires_in' => 172800])->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
