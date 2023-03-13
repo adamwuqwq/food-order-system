@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use \Illuminate\Validation\ValidationException;
-use App\Services\AdminAccountManagementService;
-use App\Models\Admins;
 use Illuminate\Support\Facades\Hash;
+use \Illuminate\Validation\ValidationException;
+use App\Models\Admins;
 
 class AuthorizationController extends Controller
 {

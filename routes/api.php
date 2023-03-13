@@ -9,6 +9,9 @@ use App\Http\Controllers\OrderManagementController;
 use App\Http\Controllers\SeatManagementController;
 use App\Http\Controllers\AuthorizationController;
 
+/**
+ * Summary: 客側のAPI
+ */
 Route::group(['middleware' => ['customerAuthorization']], function () {
     // メニューの取得
     Route::get('/customer/dish', [CustomerController::class, 'customerMenuGet']);
@@ -27,170 +30,98 @@ Route::group(['middleware' => ['customerAuthorization']], function () {
 });
 
 /**
- * Summary: 管理者(system, owner, counter, kitchen)ログイン
+ * Summary: 管理者ログイン
  * Output-Formats: [application/json]
  */
 Route::post('/management/login', [AuthorizationController::class, 'adminLogin']);
 
-/**
- * Summary: 管理者アカウントの一覧取得 (ownerは自分の店舗に所属しているアカウントのみ取得可能)
- * Output-Formats: [application/json]
- */
-Route::get('/management/account', [AccountManagementController::class, 'adminList']);
 
 /**
- * Summary: 新規管理者アカウント(owner, counter, kitchen)発行
- * Output-Formats: [application/json]
+ * Summary: 店舗管理者(owner)のAPI
  */
-Route::post('/management/account', [AccountManagementController::class, 'adminSignUp']);
+Route::group(['middleware' => ['auth:sanctum']], function () {
 
-/**
- * Summary: 管理者アカウント(owner, counter, kitchen)削除
- */
-Route::delete('/management/account/{admin_id}', [AccountManagementController::class, 'adminDelete']);
+    // 管理者アカウントの一覧取得 (ownerは自分の店舗に所属しているアカウントのみ取得可能)
+    Route::get('/management/account', [AccountManagementController::class, 'adminList']);
 
-/**
- * Summary: 管理者アカウント情報取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/account/{admin_id}', [AccountManagementController::class, 'adminGet']);
+    // 新規管理者アカウント(owner, counter, kitchen)発行
+    Route::post('/management/account', [AccountManagementController::class, 'adminSignUp']);
 
-/**
- * Summary: 管理者アカウント(owner, counter, kitchen)情報編集
- */
-Route::put('/management/account/{admin_id}', [AccountManagementController::class, 'adminModify']);
+    // 管理者アカウント(owner, counter, kitchen)削除
+    Route::delete('/management/account/{admin_id}', [AccountManagementController::class, 'adminDelete']);
 
-/**
- * Summary: メニューに料理を追加(新規作成)
- * Output-Formats: [application/json]
- */
-Route::post('/management/dish/byRestaurant/{restaurant_id}', [DishManagementController::class, 'dishCreate']);
+    // 管理者アカウント情報取得
+    Route::get('/management/account/{admin_id}', [AccountManagementController::class, 'adminGet']);
 
-/**
- * Summary: 料理メニューの一覧取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/dish/byRestaurant/{restaurant_id}', [DishManagementController::class, 'dishList']);
+    // Summary: 管理者アカウント(owner, counter, kitchen)情報編集
+    Route::put('/management/account/{admin_id}', [AccountManagementController::class, 'adminModify']);
 
-/**
- * Summary: 料理の削除
- */
-Route::delete('/management/dish/{dish_id}', [DishManagementController::class, 'dishDelete']);
+    // メニューに料理を追加(新規作成)
+    Route::post('/management/dish/byRestaurant/{restaurant_id}', [DishManagementController::class, 'dishCreate']);
 
-/**
- * Summary: 指定した料理情報取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/dish/{dish_id}', [DishManagementController::class, 'dishGet']);
+    // 料理メニューの一覧取得
+    Route::get('/management/dish/byRestaurant/{restaurant_id}', [DishManagementController::class, 'dishList']);
 
-/**
- * Summary: 料理情報編集
- */
-Route::put('/management/dish/{dish_id}', [DishManagementController::class, 'dishModify']);
+    // 料理の削除
+    Route::delete('/management/dish/{dish_id}', [DishManagementController::class, 'dishDelete']);
 
-/**
- * Summary: 注文した(+未提供)料理のキャンセル
- */
-Route::put('/management/order/byOrderedDish/{ordered_dish_id}/cancel', [OrderManagementController::class, 'orderedDishCancel']);
+    // 指定した料理情報取得
+    Route::get('/management/dish/{dish_id}', [DishManagementController::class, 'dishGet']);
 
-/**
- * Summary: 注文ステータスを提供済みにする
- */
-Route::put('/management/order/byOrderedDish/{ordered_dish_id}/deliver', [OrderManagementController::class, 'orderedDishDelivery']);
+    // 料理情報編集
+    Route::put('/management/dish/{dish_id}', [DishManagementController::class, 'dishModify']);
 
-/**
- * Summary: 指定した店舗の注文一覧の取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/order/byRestaurant/{restaurant_id}', [OrderManagementController::class, 'orderList']);
+    // 注文した(+未提供)料理のキャンセル
+    Route::put('/management/order/byOrderedDish/{ordered_dish_id}/cancel', [OrderManagementController::class, 'orderedDishCancel']);
 
-/**
- * Summary: 指定した店舗の未提供料理一覧を取得 (注文時間順)
- * Output-Formats: [application/json]
- */
-Route::get('/management/order/byRestaurant/{restaurant_id}/unserved', [OrderManagementController::class, 'unservedDishList']);
+    // 注文ステータスを提供済みにする
+    Route::put('/management/order/byOrderedDish/{ordered_dish_id}/deliver', [OrderManagementController::class, 'orderedDishDelivery']);
 
-/**
- * Summary: 注文詳細の取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/order/{order_id}', [OrderManagementController::class, 'orderGet']);
+    // 指定した店舗の注文一覧の取得
+    Route::get('/management/order/byRestaurant/{restaurant_id}', [OrderManagementController::class, 'orderList']);
 
-/**
- * Summary: (会計済みボタン) 注文を完了する
- * Notes: 注文状態(is_paid)、座席のQRコードトークンを更新する。
- */
-Route::put('/management/order/{order_id}/checkout', [OrderManagementController::class, 'orderComplete']);
+    // 指定した店舗の未提供料理一覧を取得 (注文時間順)
+    Route::get('/management/order/byRestaurant/{restaurant_id}/unserved', [OrderManagementController::class, 'unservedDishList']);
 
-/**
- * Summary: 店舗の一覧取得 (ownerは自分の店舗のみ取得可能)
- * Output-Formats: [application/json]
- */
-Route::get('/management/restaurant', [RestaurantManagementController::class, 'restaurantList']);
+    // 注文詳細の取得
+    Route::get('/management/order/{order_id}', [OrderManagementController::class, 'orderGet']);
 
-/**
- * Summary: 新規店舗登録
- * Output-Formats: [application/json]
- */
-Route::post('/management/restaurant', [RestaurantManagementController::class, 'restaurantSignUp']);
+    // (会計済みボタン) 注文を完了する
+    Route::put('/management/order/{order_id}/checkout', [OrderManagementController::class, 'orderComplete']);
 
-/**
- * Summary: 店舗の削除
- */
-Route::delete('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantDelete']);
+    // 店舗の一覧取得 (ownerは自分の店舗のみ取得可能)
+    Route::get('/management/restaurant', [RestaurantManagementController::class, 'restaurantList']);
 
-/**
- * Summary: 指定した店舗情報取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantGet']);
+    // 新規店舗登録
+    Route::post('/management/restaurant', [RestaurantManagementController::class, 'restaurantSignUp']);
 
-/**
- * Summary: 店舗情報編集
- */
-Route::put('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantModify']);
+    // 店舗の削除
+    Route::delete('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantDelete']);
 
-/**
- * Summary: 座席の追加
- * Output-Formats: [application/json]
- */
-Route::post('/management/seat/byRestaurant/{restaurant_id}', [SeatManagementController::class, 'seatAdd']);
+    // 指定した店舗情報取得
+    Route::get('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantGet']);
 
-/**
- * Summary: 指定した店舗の座席情報一覧を取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/seat/byRestaurant/{restaurant_id}', [SeatManagementController::class, 'seatList']);
+    // 店舗情報編集
+    Route::put('/management/restaurant/{restaurant_id}', [RestaurantManagementController::class, 'restaurantModify']);
 
-/**
- * Summary: 座席の削除
- */
-Route::delete('/management/seat/{seat_id}', [SeatManagementController::class, 'seatDelete']);
+    // 座席の追加
+    Route::post('/management/seat/byRestaurant/{restaurant_id}', [SeatManagementController::class, 'seatAdd']);
 
-/**
- * Summary: 座席の編集 (編集後、自動QRコードトークン再発行)
- * Output-Formats: [application/json]
- */
-Route::put('/management/seat/{seat_id}', [SeatManagementController::class, 'seatEdit']);
+    // 指定した店舗の座席情報一覧を取得
+    Route::get('/management/seat/byRestaurant/{restaurant_id}', [SeatManagementController::class, 'seatList']);
 
-/**
- * Summary: 指定した座席の情報を取得
- * Output-Formats: [application/json]
- */
-Route::get('/management/seat/{seat_id}', [SeatManagementController::class, 'seatInfo']);
+    // 座席の削除
+    Route::delete('/management/seat/{seat_id}', [SeatManagementController::class, 'seatDelete']);
 
-/**
- * Summary: 座席のQRコードトークンを再発行
- * Output-Formats: [application/json]
- */
-Route::put('/management/seat/{seat_id}/refresh', [SeatManagementController::class, 'seatRefresh']);
+    // 座席の編集 (編集後、自動QRコードトークン再発行)
+    Route::put('/management/seat/{seat_id}', [SeatManagementController::class, 'seatEdit']);
 
-/**
- * Summary: 新規店舗の座席一括登録
- * Output-Formats: [application/json]
- */
-Route::post('/management/seat/byRestaurant/{restaurant_id}/{seat_num}', [SeatManagementController::class, 'multipleSeatAdd']);
+    // 指定した座席の情報を取得
+    Route::get('/management/seat/{seat_id}', [SeatManagementController::class, 'seatInfo']);
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+    // 座席のQRコードトークンを再発行
+    Route::put('/management/seat/{seat_id}/refresh', [SeatManagementController::class, 'seatRefresh']);
+
+    // 新規店舗の座席一括登録
+    Route::post('/management/seat/byRestaurant/{restaurant_id}/{seat_num}', [SeatManagementController::class, 'multipleSeatAdd']);
+});
