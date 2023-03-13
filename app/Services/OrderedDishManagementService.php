@@ -176,12 +176,9 @@ class OrderedDishManagementService
     {
         $orderedDishes = self::getOrderedDishListByRestaurant($restaurantID);
 
-        $unservedDishes = [];
-        foreach ($orderedDishes as $orderedDish) {
-            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
-                $unservedDishes[] = $orderedDish;
-            }
-        }
+        $unservedDishes = $orderedDishes->filter(function ($orderedDish) {
+            return (!$orderedDish->is_delivered && !$orderedDish->is_canceled);
+        });
 
         return $unservedDishes;
     }
@@ -195,12 +192,9 @@ class OrderedDishManagementService
     {
         $orderedDishes = OrderedDishManagementService::getOrderedDishListByOrder($orderID);
 
-        $unservedDishes = [];
-        foreach ($orderedDishes as $orderedDish) {
-            if (!$orderedDish->is_delivered && !$orderedDish->is_canceled) {
-                $unservedDishes[] = $orderedDish;
-            }
-        }
+        $unservedDishes = $orderedDishes->filter(function ($orderedDish) {
+            return !$orderedDish->is_delivered && !$orderedDish->is_canceled;
+        });
 
         return $unservedDishes;
     }
