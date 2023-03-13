@@ -21,8 +21,6 @@ class AccountManagementController extends Controller
      */
     public function adminList()
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         try {
             $admins = AdminAccountManagementService::getAdminList();
 
@@ -62,8 +60,6 @@ class AccountManagementController extends Controller
 
         $adminInfo = json_decode($request->getContent(), true);
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、発行可否を判定 (403エラーを返す)
-
         // 管理者アカウントを作成 (作成に失敗した場合は、500エラーを返す)
         try {
             $adminId = AdminAccountManagementService::createAdmin($adminInfo);
@@ -86,8 +82,6 @@ class AccountManagementController extends Controller
             return response()->json(['error' => '指定した管理者は存在しません'], 400);
         }
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
-
         // 管理者アカウントを削除 (削除に失敗した場合は、500エラーを返す)
         try {
             AdminAccountManagementService::deleteAdmin($adminId);
@@ -109,8 +103,6 @@ class AccountManagementController extends Controller
         if (!AdminAccountManagementService::isExist($adminId)) {
             return response()->json(['error' => '指定した管理者は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
 
         // 管理者アカウントを取得 (取得に失敗した場合は、500エラーを返す)
         $admin = AdminAccountManagementService::getAdminInfo($adminId);
@@ -152,8 +144,6 @@ class AccountManagementController extends Controller
         if (!AdminAccountManagementService::isExist($adminId)) {
             return response()->json(['error' => '指定した管理者は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
 
         // 管理者アカウントを編集 (編集に失敗した場合は、500エラーを返す)
         try {

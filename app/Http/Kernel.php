@@ -47,6 +47,10 @@ class Kernel extends HttpKernel
         'customerAuthorization' => [
             \App\Http\Middleware\CustomerAuthorizationMiddleware::class,
         ],
+
+        'adminRoleRestriction' => [
+            \App\Http\Middleware\AdminRoleRestrictionMiddleware::class,
+        ],
     ];
 
     /**

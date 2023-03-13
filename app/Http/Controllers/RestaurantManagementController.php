@@ -22,8 +22,6 @@ class RestaurantManagementController extends Controller
      */
     public function restaurantList()
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         $restaurants = RestaurantManagementService::getRestaurantList();
         // 店舗毎のowner_admin_idを取得し、レスポンスに追加
         foreach ($restaurants as $restaurant) {
@@ -59,8 +57,6 @@ class RestaurantManagementController extends Controller
 
         $restaurantInfo = json_decode($request->getContent(), true);
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、発行可否を判定 (403エラーを返す)
-
         // 店舗を作成 (作成に失敗した場合は、500エラーを返す)
         try {
             $restaurantId = RestaurantManagementService::createRestaurant($restaurantInfo);
@@ -83,8 +79,6 @@ class RestaurantManagementController extends Controller
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
         }
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
-
         // 店舗を削除 (削除に失敗した場合は、500エラーを返す)
         try {
             RestaurantManagementService::deleteRestaurant($restaurantId);
@@ -106,8 +100,6 @@ class RestaurantManagementController extends Controller
         if (!RestaurantManagementService::isExist($restaurantId)) {
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
 
         // 店舗情報を取得 (取得に失敗した場合は、500エラーを返す)
         $restaurant = RestaurantManagementService::getRestaurantInfo($restaurantId);
@@ -152,8 +144,6 @@ class RestaurantManagementController extends Controller
         if (!RestaurantManagementService::isExist($restaurantId)) {
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
 
         // 店舗情報を編集 (編集に失敗した場合は、500エラーを返す)
         try {

@@ -42,8 +42,6 @@ class DishManagementController extends Controller
             return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
         }
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、追加可否を判定 (403エラーを返す)
-
         // リクエストボディから料理情報を取得
         $dishInfo = json_decode($request->getContent(), true);
 
@@ -69,8 +67,6 @@ class DishManagementController extends Controller
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
         }
 
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
-
         return response()->json(DishManagementService::getDishList($restaurantId), 200);
     }
 
@@ -85,8 +81,6 @@ class DishManagementController extends Controller
         if (!DishManagementService::isExist($dishId)) {
             return response()->json(['error' => '指定した料理は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、削除可否を判定 (403エラーを返す)
 
         // 料理を削除 (削除に失敗した場合は、500エラーを返す)
         try {
@@ -109,8 +103,6 @@ class DishManagementController extends Controller
         if (!DishManagementService::isExist($dishId)) {
             return response()->json(['error' => '指定した料理は存在しません'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、取得可否を判定 (403エラーを返す)
 
         return response()->json(DishManagementService::getDishInfo($dishId), 200);
     }
@@ -141,8 +133,6 @@ class DishManagementController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['error' => 'リクエストの形式または内容に誤りがある'], 400);
         }
-
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得、編集可否を判定 (403エラーを返す)
 
         // リクエストボディから料理情報を取得
         $dishInfo = json_decode($request->getContent(), true);

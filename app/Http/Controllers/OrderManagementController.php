@@ -28,8 +28,6 @@ class OrderManagementController extends Controller
      */
     public function orderedDishCancel(string $orderedDishId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 注文した料理が存在するか確認(存在しない場合は、400エラーを返す)
         if (!OrderedDishManagementService::isExist($orderedDishId)) {
             return response()->json(['error' => '指定した料理は存在しません'], 400);
@@ -52,8 +50,6 @@ class OrderManagementController extends Controller
      */
     public function orderedDishDelivery(string $orderedDishId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 注文した料理が存在するか確認(存在しない場合は、400エラーを返す)
         if (!OrderedDishManagementService::isExist($orderedDishId)) {
             return response()->json(['error' => '指定した料理は存在しません'], 400);
@@ -76,8 +72,6 @@ class OrderManagementController extends Controller
      */
     public function orderList(string $restaurantId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 指定した店舗が存在するか確認(存在しない場合は、400エラーを返す)
         if (!RestaurantManagementService::isExist($restaurantId)) {
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
@@ -96,8 +90,6 @@ class OrderManagementController extends Controller
      */
     public function unservedDishList(string $restaurantId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 指定した店舗が存在するか確認(存在しない場合は、400エラーを返す)
         if (!RestaurantManagementService::isExist($restaurantId)) {
             return response()->json(['error' => '指定した店舗は存在しません'], 400);
@@ -120,8 +112,6 @@ class OrderManagementController extends Controller
      */
     public function orderGet(string $orderId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 指定した注文が存在するか確認(存在しない場合は、400エラーを返す)
         if (!OrderManagementService::isExist($orderId)) {
             return response()->json(['error' => '指定した注文は存在しません'], 400);
@@ -140,8 +130,6 @@ class OrderManagementController extends Controller
      */
     public function orderComplete(string $orderId)
     {
-        // TODO: Autherizationヘッダーを使って管理者ロールを取得 (403エラーを返す)
-
         // 指定した注文が存在するか確認(存在しない場合は、400エラーを返す)
         if (!OrderManagementService::isExist($orderId)) {
             return response()->json(['error' => '指定した注文は存在しません'], 400);
