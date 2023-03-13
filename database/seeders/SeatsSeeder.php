@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Seats;
 
 class SeatsSeeder extends Seeder
 {
@@ -12,6 +12,6 @@ class SeatsSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Seats::factory()->count(80)->create();
     }
 }

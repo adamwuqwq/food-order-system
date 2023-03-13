@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\OrderedDishes;
 
 class OrderedDishesSeeder extends Seeder
 {
@@ -12,6 +12,6 @@ class OrderedDishesSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        OrderedDishes::factory()->count(50)->create();
     }
 }

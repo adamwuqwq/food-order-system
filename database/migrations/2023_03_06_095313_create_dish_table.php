@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('dish_name');
             $table->string('image_url')->nullable();
             $table->string('dish_category')->default('unspecified');
-            $table->multiLineString('dish_description')->nullable();
+            $table->text('dish_description')->nullable();
             $table->integer('dish_price')->default(0);
             $table->integer('available_num')->default(0);
             $table->timestamps();

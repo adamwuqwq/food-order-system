@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\AdminRestaurantRelationships;
 
 class AdminRestaurantRelationshipsSeeder extends Seeder
 {
@@ -12,6 +12,6 @@ class AdminRestaurantRelationshipsSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        AdminRestaurantRelationships::factory()->count(20)->create();
     }
 }
