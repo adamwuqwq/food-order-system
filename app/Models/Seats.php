@@ -11,7 +11,7 @@ class Seats extends Model
 {
     use HasFactory;
 
-    protected $table = 'seats';
+    protected $table = 'seat';
 
     protected $primaryKey = 'seat_id';
 

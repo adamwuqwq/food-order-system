@@ -10,7 +10,7 @@ class OrderedDishes extends Model
 {
     use HasFactory;
 
-    protected $table = 'ordered_dishes';
+    protected $table = 'ordered_dish';
 
     protected $primaryKey = 'ordered_dish_id';
 

@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('seats', function (Blueprint $table) {
+        Schema::create('seat', function (Blueprint $table) {
             $table->bigIncrements('seat_id');
             $table->bigInteger('restaurant_id')->unsigned();
             $table->string('seat_name');
             $table->string('qr_code_token');
             $table->boolean('is_available')->default(true);
             $table->timestamps();
-            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
+            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurant');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('seats');
+        Schema::dropIfExists('seat');
     }
 };

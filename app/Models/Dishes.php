@@ -11,7 +11,7 @@ class Dishes extends Model
 {
     use HasFactory;
 
-    protected $table = 'dishes';
+    protected $table = 'dish';
 
     protected $primaryKey = 'dish_id';
 

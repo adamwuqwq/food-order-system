@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ordered_dishes', function (Blueprint $table) {
+        Schema::create('ordered_dish', function (Blueprint $table) {
             $table->bigIncrements('ordered_dish_id');
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('restaurant_id')->unsigned();
@@ -20,9 +20,9 @@ return new class extends Migration
             $table->boolean('is_delivered')->default(false);
             $table->boolean('is_canceled')->default(false);
             $table->timestamps();
-            $table->foreign('order_id')->references('order_id')->on('orders');
-            $table->foreign('dish_id')->references('dish_id')->on('dishes')->cascadeOnDelete();
-            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
+            $table->foreign('order_id')->references('order_id')->on('order');
+            $table->foreign('dish_id')->references('dish_id')->on('dish')->cascadeOnDelete();
+            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurant');
         });
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ordered_dishes');
+        Schema::dropIfExists('ordered_dish');
     }
 };

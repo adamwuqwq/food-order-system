@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('order', function (Blueprint $table) {
             $table->bigIncrements('order_id');
             $table->bigInteger('restaurant_id')->unsigned();
             $table->bigInteger('seat_id')->unsigned();
@@ -19,8 +19,8 @@ return new class extends Migration
             $table->boolean('is_paid')->default(false);
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
-            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
-            $table->foreign('seat_id')->references('seat_id')->on('seats')->cascadeOnDelete();
+            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurant');
+            $table->foreign('seat_id')->references('seat_id')->on('seat')->cascadeOnDelete();
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('order');
     }
 };

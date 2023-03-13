@@ -12,7 +12,7 @@ class Admins extends Authenticatable
 {
     use HasFactory, HasApiTokens;
 
-    protected $table = 'admins';
+    protected $table = 'admin';
 
     protected $primaryKey = 'admin_id';
 

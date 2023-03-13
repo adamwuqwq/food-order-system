@@ -10,7 +10,7 @@ class AdminRestaurantRelationships extends Model
 {
     use HasFactory;
 
-    protected $table = 'admin_restaurant_relationships';
+    protected $table = 'admin_restaurant_relationship';
 
     protected $primaryKey = 'relationship_id';
 

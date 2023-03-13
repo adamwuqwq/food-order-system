@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admin_restaurant_relationships', function (Blueprint $table) {
+        Schema::create('admin_restaurant_relationship', function (Blueprint $table) {
             $table->bigIncrements('relationship_id');
             $table->bigInteger('admin_id')->unsigned();
             $table->bigInteger('restaurant_id')->unsigned();
             $table->enum('admin_role', ['system', 'owner', 'counter', 'kitchen']);
             $table->timestamps();
-            $table->foreign('admin_id')->references('admin_id')->on('admins');
-            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurants');
+            $table->foreign('admin_id')->references('admin_id')->on('admin');
+            $table->foreign('restaurant_id')->references('restaurant_id')->on('restaurant');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admin_restaurant_relationships');
+        Schema::dropIfExists('admin_restaurant_relationship');
     }
 };
