@@ -139,7 +139,7 @@ bearerAuth
 
 ```json
 {
-  "admin_owner_id": 0,
+  "owner_admin_id": 0,
   "restaurant_name": "string",
   "restaurant_address": "string",
   "restaurant_image_url": "string"
@@ -152,7 +152,7 @@ bearerAuth
 |---|---|---|---|---|
 |authorization|header|string|true|/management/login で取得したトークン|
 |body|body|object|false|none|
-|» admin_owner_id|body|integer|true|オーナーの管理者ID|
+|» owner_admin_id|body|integer|true|オーナーの管理者ID|
 |» restaurant_name|body|string|true|店舗の名称|
 |» restaurant_address|body|string|false|none|
 |» restaurant_image_url|body|string|false|none|
@@ -618,8 +618,9 @@ bearerAuth
           "dish_id": 0,
           "dish_name": "string",
           "image_url": "string",
-          "price": 0,
-          "available_num": 0
+          "dish_price": 0,
+          "available_num": 0,
+          "dish_description": "string"
         }
       ]
     }
@@ -648,8 +649,9 @@ Status Code **200**
 |»»» dish_id|integer|false|none|料理ID|
 |»»» dish_name|string|false|none|料理名|
 |»»» image_url|string|false|none|料理画像のURL|
-|»»» price|integer|false|none|料理の価格|
+|»»» dish_price|integer|false|none|料理の価格|
 |»»» available_num|integer|false|none|料理の在庫数|
+|»»» dish_description|string|false|none|料理の説明|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -672,9 +674,10 @@ bearerAuth
     {
       "dish_name": "string",
       "dish_category": "string",
-      "price": 0,
+      "dish_price": 0,
       "available_num": 0,
-      "image_url": "string"
+      "image_url": "string",
+      "dish_description": "string"
     }
   ]
 }
@@ -690,9 +693,10 @@ bearerAuth
 |» dishes|body|[object]|false|none|
 |»» dish_name|body|string|true|料理の名称|
 |»» dish_category|body|string|false|料理の種類|
-|»» price|body|integer|true|料理の値段|
+|»» dish_price|body|integer|true|料理の値段|
 |»» available_num|body|integer|true|料理の在庫数|
 |»» image_url|body|string|false|料理の画像|
+|»» dish_description|body|string|false|料理の説明|
 
 > Example responses
 
@@ -750,9 +754,10 @@ bearerAuth
   "dish_id": 0,
   "dish_name": "string",
   "dish_category": "string",
-  "price": 0,
+  "dish_price": 0,
   "available_num": 0,
-  "image_url": "string"
+  "image_url": "string",
+  "dish_description": "string"
 }
 ```
 
@@ -774,9 +779,10 @@ Status Code **200**
 |» dish_id|integer|false|none|料理ID|
 |» dish_name|string|false|none|料理の名称|
 |» dish_category|string|false|none|料理の種類|
-|» price|integer|false|none|料理の値段|
+|» dish_price|integer|false|none|料理の値段|
 |» available_num|integer|false|none|料理の在庫数|
 |» image_url|string|false|none|料理の画像|
+|» dish_description|string|false|none|料理の説明|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -797,9 +803,10 @@ bearerAuth
 {
   "dish_name": "string",
   "dish_category": "string",
-  "price": 0,
+  "dish_price": 0,
   "available_num": 0,
-  "image_url": "string"
+  "image_url": "string",
+  "dish_description": "string"
 }
 ```
 
@@ -812,9 +819,10 @@ bearerAuth
 |body|body|object|false|none|
 |» dish_name|body|string|false|料理の名称|
 |» dish_category|body|string|false|料理の種類|
-|» price|body|integer|false|料理の値段|
+|» dish_price|body|integer|false|料理の値段|
 |» available_num|body|integer|false|料理の在庫数|
 |» image_url|body|string|false|料理の画像|
+|» dish_description|body|string|false|料理の説明|
 
 <h3 id="dishmodify-responses">Responses</h3>
 
@@ -886,7 +894,7 @@ bearerAuth
       "seat_name": "string",
       "is_available": true,
       "order_id": 0,
-      "qr_code_token": "string"
+      "Seat-Token": "string"
     }
   ]
 }
@@ -912,7 +920,7 @@ Status Code **200**
 |»» seat_name|string|false|none|座席の名称|
 |»» is_available|boolean|false|none|座席の空席状況 (空席true, 満席false)|
 |»» order_id|integer|false|none|座席の注文ID|
-|»» qr_code_token|string|false|none|座席のQRコードのトークン|
+|»» Seat-Token|string|false|none|座席のQRコードのトークン|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -951,7 +959,7 @@ bearerAuth
 ```json
 {
   "seat_id": 0,
-  "qr_code_token": "string"
+  "Seat-Token": "string"
 }
 ```
 
@@ -971,7 +979,59 @@ Status Code **200**
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |» seat_id|integer|false|none|追加された座席のID|
-|» qr_code_token|string|false|none|追加された座席のQRコードのトークン|
+|» Seat-Token|string|false|none|追加された座席のQRコードのトークン|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
+## multipleSeatAdd
+
+<a id="opIdmultipleSeatAdd"></a>
+
+`POST /management/seat/byRestaurant/{restaurant_id}/{seat_num}`
+
+*新規店舗の座席一括追加*
+
+<h3 id="multipleseatadd-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|authorization|header|string|true|/management/login で取得したトークン|
+|restaurant_id|path|integer|true|座席を追加したい店舗のID|
+|seat_num|path|integer|true|座席を追加したい店舗の座席数|
+
+> Example responses
+
+> 200 Response
+
+```json
+[
+  {
+    "seat_id": 0,
+    "Seat-Token": "string"
+  }
+]
+```
+
+<h3 id="multipleseatadd-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|Inline|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request (リクエストに不備がある)|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
+|403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を追加可能)|None|
+
+<h3 id="multipleseatadd-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» seat_id|integer|false|none|追加された座席のID|
+|» Seat-Token|string|false|none|追加された座席のQRコードのトークン|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -1003,7 +1063,7 @@ bearerAuth
   "seat_name": "string",
   "is_available": true,
   "order_id": 0,
-  "qr_code_token": "string"
+  "Seat-Token": "string"
 }
 ```
 
@@ -1026,7 +1086,7 @@ Status Code **200**
 |» seat_name|string|false|none|座席の名称|
 |» is_available|boolean|false|none|座席の空席状況 (空席true, 満席false)|
 |» order_id|integer|false|none|座席の注文ID|
-|» qr_code_token|string|false|none|座席のQRコードのトークン|
+|» Seat-Token|string|false|none|座席のQRコードのトークン|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -1039,7 +1099,7 @@ bearerAuth
 
 `PUT /management/seat/{seat_id}`
 
-*座席の編集 (編集後、自動QRコードトークン再発行)*
+*座席の編集*
 
 空席 -> 使用不可に変更したい場合にも使える
 
@@ -1068,7 +1128,7 @@ bearerAuth
 
 ```json
 {
-  "qr_code_token": "string"
+  "Seat-Token": "string"
 }
 ```
 
@@ -1087,7 +1147,7 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» qr_code_token|string|false|none|編集された座席のQRコードのトークン|
+|» Seat-Token|string|false|none|編集された座席のQRコードのトークン|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -1144,7 +1204,7 @@ bearerAuth
 
 ```json
 {
-  "qr_code_token": "string"
+  "Seat-Token": "string"
 }
 ```
 
@@ -1163,7 +1223,7 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» qr_code_token|string|false|none|再発行された座席のQRコードのトークン|
+|» Seat-Token|string|false|none|再発行された座席のQRコードのトークン|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -1485,7 +1545,7 @@ bearerAuth
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|authorization|header|string|true|座席のQRコードに含まれているトークン|
+|Seat-Token|header|string|true|座席のQRコードに含まれているトークン|
 
 > Example responses
 
@@ -1500,7 +1560,7 @@ bearerAuth
         "dish_id": 0,
         "dish_name": "string",
         "image_url": "string",
-        "price": 0,
+        "dish_price": 0,
         "available_num": 0
       }
     ]
@@ -1526,12 +1586,11 @@ Status Code **200**
 |»» dish_id|integer|false|none|料理ID|
 |»» dish_name|string|false|none|料理名|
 |»» image_url|string|false|none|料理画像のURL|
-|»» price|integer|false|none|料理の価格|
+|»» dish_price|integer|false|none|料理の価格|
 |»» available_num|integer|false|none|料理の在庫数|
 
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-bearerAuth
+<aside class="success">
+This operation does not require authentication
 </aside>
 
 ## customerMenuDishGet
@@ -1546,7 +1605,7 @@ bearerAuth
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|authorization|header|string|true|座席のQRコードに含まれているトークン|
+|Seat-Token|header|string|true|座席のQRコードに含まれているトークン|
 |dish_id|path|integer|true|料理のID|
 
 > Example responses
@@ -1558,7 +1617,7 @@ bearerAuth
   "dish_id": 0,
   "dish_name": "string",
   "image_url": "string",
-  "price": 0,
+  "dish_price": 0,
   "available_num": 0
 }
 ```
@@ -1580,12 +1639,11 @@ Status Code **200**
 |» dish_id|integer|false|none|料理ID|
 |» dish_name|string|false|none|料理名|
 |» image_url|string|false|none|料理画像のURL|
-|» price|integer|false|none|料理の価格|
+|» dish_price|integer|false|none|料理の価格|
 |» available_num|integer|false|none|料理の在庫数|
 
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-bearerAuth
+<aside class="success">
+This operation does not require authentication
 </aside>
 
 ## customerOrderGet
@@ -1600,30 +1658,28 @@ bearerAuth
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|authorization|header|string|true|座席のQRコードに含まれているトークン|
+|Seat-Token|header|string|true|座席のQRコードに含まれているトークン|
 
 > Example responses
 
 > 200 Response
 
 ```json
-[
-  {
-    "order_id": 0,
-    "ordered_dishes": [
-      {
-        "ordered_dish_id": 0,
-        "ordered_dish_name": "string",
-        "ordered_dish_price": 0,
-        "ordered_dish_num": 0,
-        "ordered_dish_status": "string"
-      }
-    ],
-    "total_price": 0,
-    "is_paid": true,
-    "created_at": "string"
-  }
-]
+{
+  "order_id": 0,
+  "ordered_dishes": [
+    {
+      "ordered_dish_id": 0,
+      "ordered_dish_name": "string",
+      "ordered_dish_price": 0,
+      "ordered_dish_num": 0,
+      "ordered_dish_status": "string"
+    }
+  ],
+  "total_price": 0,
+  "is_paid": true,
+  "created_at": "string"
+}
 ```
 
 <h3 id="customerorderget-responses">Responses</h3>
@@ -1650,9 +1706,8 @@ Status Code **200**
 |» is_paid|boolean|false|none|会計済みかどうか|
 |» created_at|string|false|none|注文日時|
 
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-bearerAuth
+<aside class="success">
+This operation does not require authentication
 </aside>
 
 ## customerOrderPost
@@ -1680,7 +1735,7 @@ bearerAuth
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|authorization|header|string|true|座席のQRコードに含まれているトークン|
+|Seat-Token|header|string|true|座席のQRコードに含まれているトークン|
 |body|body|object|true|none|
 |» ordered_dishes|body|[object]|false|none|
 |»» dish_id|body|integer|true|注文した料理のID|
@@ -1721,9 +1776,8 @@ Status Code **200**
 |»» ordered_dish_id|integer|false|none|注文した料理の注文ID|
 |»» ordered_dish_name|string|false|none|注文した料理の名称|
 
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-bearerAuth
+<aside class="success">
+This operation does not require authentication
 </aside>
 
 ## customerOrderFinish
@@ -1740,7 +1794,7 @@ bearerAuth
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|authorization|header|string|true|座席のQRコードに含まれているトークン|
+|Seat-Token|header|string|true|座席のQRコードに含まれているトークン|
 
 <h3 id="customerorderfinish-responses">Responses</h3>
 
@@ -1750,8 +1804,7 @@ bearerAuth
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad Request (注文が既に締め切られている、もしくは未注文)|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Unauthorized (トークンが無効)|None|
 
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-bearerAuth
+<aside class="success">
+This operation does not require authentication
 </aside>
 

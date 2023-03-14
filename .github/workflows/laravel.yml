@@ -44,7 +44,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Setup .env config
-        run: cp .env.example .env
+        run: cp .env.githubactions .env
 
       - name: Install composer packages
         if: steps.cache.outputs.cache-hit != 'true'
