@@ -10,7 +10,7 @@ class Restaurants extends Model
 {
     use HasFactory;
 
-    protected $table = 'restaurants';
+    protected $table = 'restaurant';
 
     protected $primaryKey = 'restaurant_id';
 
@@ -23,6 +23,11 @@ class Restaurants extends Model
     protected $attributes = [
         'restaurant_address' => null,
         'restaurant_image_url' => null,
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     public function orderedDishes(): HasMany

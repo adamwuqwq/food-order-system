@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('restaurants', function (Blueprint $table) {
+        Schema::create('restaurant', function (Blueprint $table) {
             $table->bigIncrements('restaurant_id');
             $table->string('restaurant_name')->unique();
             $table->string('restaurant_address')->nullable();
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('restaurants');
+        Schema::dropIfExists('restaurant');
     }
 };

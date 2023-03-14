@@ -1,0 +1,63 @@
+name: Laravel Test
+
+on:
+  push:
+    branches:
+      - main
+      - "fix/**"
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+      - "fix/**"
+      - "feature/**"
+
+env:
+  DB_DATABASE: qr_order_db
+  DB_PASSWORD: password
+
+jobs:
+  feature_test:
+    name: Laravel Feature Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0.32
+        ports:
+          - 3306:3306
+        options: --health-cmd "mysqladmin ping -h localhost" --health-interval 20s --health-timeout 10s --health-retries 10
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ env.DB_DATABASE }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache vendor
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Setup .env config
+        run: cp .env.githubactions .env
+
+      - name: Install composer packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: composer install -n --prefer-dist
+
+      - name: Composer dump autoload
+        run: composer dump-autoload
+
+      - name: Migration
+        run: php artisan migrate
+
+      - name: Seeding
+        run: php artisan db:seed
+
+      - name: Feature Test
+        run: php artisan test

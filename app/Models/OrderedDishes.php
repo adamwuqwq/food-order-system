@@ -10,7 +10,7 @@ class OrderedDishes extends Model
 {
     use HasFactory;
 
-    protected $table = 'ordered_dishes';
+    protected $table = 'ordered_dish';
 
     protected $primaryKey = 'ordered_dish_id';
 
@@ -27,6 +27,11 @@ class OrderedDishes extends Model
         'quantity' => 0,
         'is_delivered' => false,
         'is_canceled' => false,
+    ];
+
+    protected $hidden = [
+        'is_canceled',
+        'updated_at',
     ];
 
     public function orders(): BelongsTo

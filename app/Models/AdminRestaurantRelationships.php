@@ -10,13 +10,19 @@ class AdminRestaurantRelationships extends Model
 {
     use HasFactory;
 
-    protected $table = 'admin_restaurant_relationships';
+    protected $table = 'admin_restaurant_relationship';
 
     protected $primaryKey = 'relationship_id';
 
     protected $fillable = [
         'admin_id',
         'restaurant_id',
+        'admin_role',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     public function admins(): BelongsTo

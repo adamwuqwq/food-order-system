@@ -16,7 +16,7 @@ public_html/storage
 public_html/hot
 
 storage/*.key
-.env
+#.env
 Homestead.yaml
 Homestead.json
 /.vagrant
@@ -24,3 +24,8 @@ Homestead.json
 
 # MacOS
 .DS_Store
+
+# Open API generator
+/.openapi-generator
+.openapi-generator-ignore
+/oapi_generated

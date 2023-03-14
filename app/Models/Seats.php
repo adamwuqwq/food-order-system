@@ -11,7 +11,7 @@ class Seats extends Model
 {
     use HasFactory;
 
-    protected $table = 'seats';
+    protected $table = 'seat';
 
     protected $primaryKey = 'seat_id';
 
@@ -24,6 +24,11 @@ class Seats extends Model
 
     protected $attributes = [
         'is_available' => true,
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     public function orders(): HasMany

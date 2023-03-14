@@ -39,14 +39,14 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                login_id:
                   type: string
                   description: ログイン用ユーザーID
                 password:
                   type: string
                   description: ログイン用パスワード
               required:
-                - username
+                - login_id
                 - password
       parameters: []
 
@@ -75,7 +75,7 @@ paths:
                           type: string
                         owner_admin_id:
                           type: integer
-                        owner_name:
+                        restaurant_image_url:
                           type: string
         "401":
           description: Unauthorized (トークンが無効)
@@ -119,14 +119,18 @@ paths:
             schema:
               type: object
               properties:
-                admin_owner_id:
+                owner_admin_id:
                   type: integer
                   description: オーナーの管理者ID
                 restaurant_name:
                   type: string
                   description: 店舗の名称
+                restaurant_address:
+                  type: string
+                restaurant_image_url:
+                  type: string
               required:
-                - admin_owner_id
+                - owner_admin_id
                 - restaurant_name
       parameters:
         - schema:
@@ -164,6 +168,10 @@ paths:
                   owner_name:
                     type: string
                     description: オーナーの名前
+                  restaurant_address:
+                    type: string
+                  restaurant_image_url:
+                    type: string
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -212,6 +220,10 @@ paths:
                 owner_admin_id:
                   type: integer
                   description: オーナーの管理者ID
+                restaurant_address:
+                  type: string
+                restaurant_image_url:
+                  type: string
       parameters:
         - schema:
             type: string
@@ -281,7 +293,7 @@ paths:
                           type: integer
                         name:
                           type: string
-                        username:
+                        login_id:
                           type: string
                         restaurants_id:
                           type: array
@@ -338,21 +350,23 @@ paths:
                 admin_name:
                   type: string
                   description: 管理者名前
-                username:
+                login_id:
                   type: string
                   description: ログイン用ユーザーID
                 password:
                   type: string
                   description: ログイン用パスワード
-                restaurant_id:
-                  type: integer
+                restaurants_id:
+                  type: array
+                  items:
+                    type: integer
                   description: 所属している店舗のID
                 admin_role:
                   type: string
                   description: 管理者のロール(owner, counter, kitchen)
               required:
                 - admin_name
-                - username
+                - login_id
                 - password
                 - admin_role
       parameters:
@@ -385,7 +399,7 @@ paths:
                   name:
                     type: string
                     description: 管理者名前
-                  username:
+                  login_id:
                     type: string
                     description: ログイン用ユーザーID
                   restaurants_id:
@@ -452,12 +466,11 @@ paths:
                 password:
                   type: string
                   description: ログイン用パスワード
-                restaurant_id:
-                  type: integer
+                restaurants_id:
+                  type: array
+                  items:
+                    type: integer
                   description: 所属している店舗のID
-                admin_role:
-                  type: string
-                  description: 管理者のロール(owner, counter, kitchen)
       parameters:
         - schema:
             type: string
@@ -541,12 +554,15 @@ paths:
                               image_url:
                                 type: string
                                 description: 料理画像のURL
-                              price:
+                              dish_price:
                                 type: integer
                                 description: 料理の価格
                               available_num:
                                 type: integer
                                 description: 料理の在庫数
+                              dish_description:
+                                type: string
+                                description: 料理の説明
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -608,7 +624,7 @@ paths:
                       dish_category:
                         type: string
                         description: 料理の種類
-                      price:
+                      dish_price:
                         type: integer
                         description: 料理の値段
                       available_num:
@@ -617,9 +633,12 @@ paths:
                       image_url:
                         type: string
                         description: 料理の画像
+                      dish_description:
+                        type: string
+                        description: 料理の説明
                     required:
                       - dish_name
-                      - price
+                      - dish_price
                       - available_num
       parameters:
         - schema:
@@ -660,7 +679,7 @@ paths:
                   dish_category:
                     type: string
                     description: 料理の種類
-                  price:
+                  dish_price:
                     type: integer
                     description: 料理の値段
                   available_num:
@@ -669,6 +688,9 @@ paths:
                   image_url:
                     type: string
                     description: 料理の画像
+                  dish_description:
+                    type: string
+                    description: 料理の説明
         "400":
           description: Bad Request (リクエストに不備がある)
         "401":
@@ -717,7 +739,7 @@ paths:
                 dish_category:
                   type: string
                   description: 料理の種類
-                price:
+                dish_price:
                   type: integer
                   description: 料理の値段
                 available_num:
@@ -726,6 +748,9 @@ paths:
                 image_url:
                   type: string
                   description: 料理の画像
+                dish_description:
+                  type: string
+                  description: 料理の説明
       parameters:
         - schema:
             type: string
@@ -803,7 +828,7 @@ paths:
                         order_id:
                           type: integer
                           description: 座席の注文ID
-                        qr_code_token:
+                        Seat-Token:
                           type: string
                           description: 座席のQRコードのトークン
         "400":
@@ -844,7 +869,7 @@ paths:
                   seat_id:
                     type: integer
                     description: 追加された座席のID
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 追加された座席のQRコードのトークン
         "400":
@@ -880,6 +905,56 @@ paths:
       security:
         - bearerAuth: []
 
+  /management/seat/byRestaurant/{restaurant_id}/{seat_num}:
+    post:
+      tags:
+        - management
+      summary: 新規店舗の座席一括追加
+      operationId: multipleSeatAdd
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    seat_id:
+                      type: integer
+                      description: 追加された座席のID
+                    Seat-Token:
+                      type: string
+                      description: 追加された座席のQRコードのトークン
+        "400":
+          description: Bad Request (リクエストに不備がある)
+        "401":
+          description: Unauthorized (トークンが無効)
+        "403":
+          description: Permission Denied (counter, kitchenはアクセス権がない。ownerは自分の店舗のみ座席を追加可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 座席を追加したい店舗のID
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: seat_num
+          description: 座席を追加したい店舗の座席数
+      security:
+        - bearerAuth: []
+
   /management/seat/{seat_id}:
     get:
       tags:
@@ -906,7 +981,7 @@ paths:
                   order_id:
                     type: integer
                     description: 座席の注文ID
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 座席のQRコードのトークン
         "400":
@@ -934,7 +1009,7 @@ paths:
     put:
       tags:
         - management
-      summary: 座席の編集 (編集後、自動QRコードトークン再発行)
+      summary: 座席の編集
       description: 空席 -> 使用不可に変更したい場合にも使える
       operationId: seatEdit
       responses:
@@ -945,7 +1020,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 編集された座席のQRコードのトークン
         "400":
@@ -1026,7 +1101,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  qr_code_token:
+                  Seat-Token:
                     type: string
                     description: 再発行された座席のQRコードのトークン
         "400":
@@ -1165,6 +1240,19 @@ paths:
           description: Unauthorized (トークンが無効)
         "403":
           description: Permission Denied (owner, counter, kitchenは自分の店舗のみ取得可能)
+      parameters:
+        - schema:
+            type: string
+          in: header
+          required: true
+          name: authorization
+          description: /management/login で取得したトークン
+        - schema:
+            type: integer
+          in: path
+          required: true
+          name: restaurant_id
+          description: 未提供料理一覧を取得したい店舗のID
       security:
         - bearerAuth: []
 
@@ -1257,7 +1345,7 @@ paths:
         - management
       description: 注文状態(is_paid)、座席のQRコードトークンを更新する。
       summary: (会計済みボタン) 注文を完了する
-      operationId: orderGet
+      operationId: orderPut
       responses:
         "200":
           description: OK
@@ -1283,7 +1371,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /management/byOrderedDish/{ordered_dish_id}/cancel:
+  /management/order/byOrderedDish/{ordered_dish_id}/cancel:
     put:
       tags:
         - management
@@ -1378,7 +1466,7 @@ paths:
                           image_url:
                             type: string
                             description: 料理画像のURL
-                          price:
+                          dish_price:
                             type: integer
                             description: 料理の価格
                           available_num:
@@ -1391,10 +1479,8 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
 
   /customer/dish/{dish_id}:
     get:
@@ -1419,7 +1505,7 @@ paths:
                   image_url:
                     type: string
                     description: 料理画像のURL
-                  price:
+                  dish_price:
                     type: integer
                     description: 料理の価格
                   available_num:
@@ -1434,7 +1520,7 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
         - schema:
             type: integer
@@ -1442,8 +1528,6 @@ paths:
           required: true
           name: dish_id
           description: 料理のID
-      security:
-        - bearerAuth: []
 
   /customer/order:
     get:
@@ -1457,42 +1541,40 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    order_id:
-                      type: integer
-                      description: 注文ID
-                    ordered_dishes:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          ordered_dish_id:
-                            type: integer
-                            description: 注文した料理の注文ID
-                          ordered_dish_name:
-                            type: string
-                            description: 注文した料理の名称
-                          ordered_dish_price:
-                            type: integer
-                            description: 注文した料理の価格
-                          ordered_dish_num:
-                            type: integer
-                            description: 注文した料理の個数
-                          ordered_dish_status:
-                            type: string
-                            description: 注文した料理のステータス
-                    total_price:
-                      type: integer
-                      description: 合計金額
-                    is_paid:
-                      type: boolean
-                      description: 会計済みかどうか
-                    created_at:
-                      type: string
-                      description: 注文日時
+                type: object
+                properties:
+                  order_id:
+                    type: integer
+                    description: 注文ID
+                  ordered_dishes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ordered_dish_id:
+                          type: integer
+                          description: 注文した料理の注文ID
+                        ordered_dish_name:
+                          type: string
+                          description: 注文した料理の名称
+                        ordered_dish_price:
+                          type: integer
+                          description: 注文した料理の価格
+                        ordered_dish_num:
+                          type: integer
+                          description: 注文した料理の個数
+                        ordered_dish_status:
+                          type: string
+                          description: 注文した料理のステータス
+                  total_price:
+                    type: integer
+                    description: 合計金額
+                  is_paid:
+                    type: boolean
+                    description: 会計済みかどうか
+                  created_at:
+                    type: string
+                    description: 注文日時
         "401":
           description: Unauthorized (トークンが無効)
       parameters:
@@ -1500,10 +1582,8 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
 
     post:
       tags:
@@ -1562,10 +1642,8 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
 
   /customer/order/finish:
     post:
@@ -1586,10 +1664,8 @@ paths:
             type: string
           in: header
           required: true
-          name: authorization
+          name: Seat-Token
           description: 座席のQRコードに含まれているトークン
-      security:
-        - bearerAuth: []
 
 components:
   securitySchemes:

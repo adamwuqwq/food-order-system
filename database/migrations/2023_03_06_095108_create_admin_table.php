@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create('admin', function (Blueprint $table) {
             $table->bigIncrements('admin_id');
             $table->string('admin_name');
             $table->string('login_id')->unique();
@@ -25,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('admin');
     }
 };

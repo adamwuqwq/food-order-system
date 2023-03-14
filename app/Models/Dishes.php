@@ -11,7 +11,7 @@ class Dishes extends Model
 {
     use HasFactory;
 
-    protected $table = 'dishes';
+    protected $table = 'dish';
 
     protected $primaryKey = 'dish_id';
 
@@ -31,6 +31,11 @@ class Dishes extends Model
         'available_num' => 0,
         'dish_price' => 0,
         'dish_description' => null,
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 
     public function restaurants(): BelongsTo
